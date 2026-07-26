@@ -48,5 +48,10 @@
   "name": "მაკარონი ერიშტა",
   "price": 7.99,
   "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQcxR8uIHYI9DhijiFqte1oL1eCjvOzENFVpXe1teAJ-29J09CskHYNcJQ&s=10"
+},
+  {
+  "name": "მაკარონი ანკარ თურქული",
+  "price": 2.49,
+  "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRt46CHCpe-0_oi6I6qbtkROgPDdRlD6tJKVaSTYlJiFA&s=10"
 }
 ]
