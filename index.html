@@ -5,13 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MINI MARKET - ახალციხე</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Firebase SDK (მონაცემების რეალურ დროში განსაახლებლად) -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
 
-    <!-- ჰედერი / ნავიგაცია -->
+    <!-- ჰედერი -->
     <header class="main-header">
         <div class="container header-container">
             <div class="logo">
@@ -33,28 +30,13 @@
         </div>
     </section>
 
-    <!-- პროდუქტების სექცია -->
+    <!-- პროდუქტების კატალოგი -->
     <main class="container catalog-section">
         <h2>პროდუქცია</h2>
         <div id="product-list" class="products-grid">
-            <!-- პროდუქტები ჩაიტვირთება დინამიურად Firebase-დან -->
             <p class="loading-text">პროდუქტები იტვირთება...</p>
         </div>
     </main>
-
-    <!-- ადმინ პანელი (ახალი პროდუქტის დასამატებლად) -->
-    <section class="container admin-section">
-        <button id="toggle-admin-btn" onclick="toggleAdmin()">⚙️ პროდუქტის დამატება (ადმინი)</button>
-        <div id="admin-panel" class="admin-panel hidden">
-            <h3>ახალი პროდუქტის დამატება</h3>
-            <form id="add-product-form">
-                <input type="text" id="prod-name" placeholder="პროდუქტის დასახელება" required>
-                <input type="number" step="0.01" id="prod-price" placeholder="ფასი (₾)" required>
-                <input type="url" id="prod-img" placeholder="სურათის URL ბმული (https://...)" required>
-                <button type="submit">დამატება / განახლება</button>
-            </form>
-        </div>
-    </section>
 
     <!-- ფუტერი -->
     <footer>
