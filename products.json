@@ -19,7 +19,8 @@
   "price": 3.80,
   "imageUrl": "https://supta.ge/img/Produkciis%20Suratebi/Qimia%20da%20Dezinfeqcia/samzareulos%20movla/fairy_atasxutasiani_erti.webp"
 },
-  "name": "წვენი ჯუსა",
+  {
+    "name": "წვენი ჯუსა",
   "price": 3.80,
   "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThQ5DTS-oYBkgzg89nyxrUk9vwQxssn_UuNyPbsxu9ow&s"
   {
