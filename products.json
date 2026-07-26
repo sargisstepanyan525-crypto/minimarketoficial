@@ -108,5 +108,10 @@
   "name": "ხიზილალა არტფუდი სომხური მწარე",
   "price": 5.99,
   "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYLQop83Ka-pIEe4hu_tC3tpis7TVU4Q3IRJaT_c3TAQ&s=10"
+},
+  {
+  "name": "ჩიპსი ოტ მარტინა",
+  "price": 1.99,
+  "imageUrl": "https://api.martinpamach.ge/MartinMedia//MainObjectMainFile/22733/geo/d35188a3375e4ed6aecc7c9109ccc9461240ad4db5514f3999da2a12a16d106d.png"
 }
 ]
