@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     const productList = document.getElementById('product-list');
 
-    // fetch-ის დროს `?t=` უზრუნველყოფს, რომ ქეშიდან არ წაიკითხოს და ყველგან ახალი მონაცემი გამოჩნდეს
     fetch('products.json?t=' + new Date().getTime())
         .then(response => {
             if (!response.ok) {
@@ -10,9 +9,9 @@ document.addEventListener("DOMContentLoaded", () => {
             return response.json();
         })
         .then(products => {
-            productList.innerHTML = ''; // გასუფთავება
+            productList.innerHTML = '';
             
-            if (products.length === 0) {
+            if (!products || products.length === 0) {
                 productList.innerHTML = '<p>პროდუქტები ჯერ არ არის დამატებული.</p>';
                 return;
             }
