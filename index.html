@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINI MARKET - ახალციხე</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Firebase SDK (მონაცემების რეალურ დროში განსაახლებლად) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body>
+
+    <!-- ჰედერი / ნავიგაცია -->
+    <header class="main-header">
+        <div class="container header-container">
+            <div class="logo">
+                <h1>MINI MARKET</h1>
+                <span>ახალციხე</span>
+            </div>
+            <div class="header-info">
+                <p>📍 იაძის ქუჩა #2, ახალციხე</p>
+                <p>📞 <a href="tel:+995500224822">+995 500 22 48 22</a></p>
+            </div>
+        </div>
+    </header>
+
+    <!-- ბანერი -->
+    <section class="hero-banner">
+        <div class="container">
+            <h2>საუკეთესო ფასები და ახალი პროდუქცია ყოველდღე!</h2>
+            <p>ეწვიეთ ჩვენს მარკეტს იაძის #2-ში ან დაგვიკავშირდით ცხელ ხაზზე.</p>
+        </div>
+    </section>
+
+    <!-- პროდუქტების სექცია -->
+    <main class="container catalog-section">
+        <h2>პროდუქცია</h2>
+        <div id="product-list" class="products-grid">
+            <!-- პროდუქტები ჩაიტვირთება დინამიურად Firebase-დან -->
+            <p class="loading-text">პროდუქტები იტვირთება...</p>
+        </div>
+    </main>
+
+    <!-- ადმინ პანელი (ახალი პროდუქტის დასამატებლად) -->
+    <section class="container admin-section">
+        <button id="toggle-admin-btn" onclick="toggleAdmin()">⚙️ პროდუქტის დამატება (ადმინი)</button>
+        <div id="admin-panel" class="admin-panel hidden">
+            <h3>ახალი პროდუქტის დამატება</h3>
+            <form id="add-product-form">
+                <input type="text" id="prod-name" placeholder="პროდუქტის დასახელება" required>
+                <input type="number" step="0.01" id="prod-price" placeholder="ფასი (₾)" required>
+                <input type="url" id="prod-img" placeholder="სურათის URL ბმული (https://...)" required>
+                <button type="submit">დამატება / განახლება</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- ფუტერი -->
+    <footer>
+        <div class="container footer-content">
+            <p>&copy; 2026 MINI MARKET. ყველა უფლება დაცულია.</p>
+            <p>მისამართი: ქ. ახალციხე, იაძის ქუჩა #2ი | ცხელი ხაზი: +995 500 22 48 22</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
