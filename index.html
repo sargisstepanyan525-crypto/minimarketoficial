@@ -3,126 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MINI MARKET - ახალციხე | პრემიუმ პროდუქცია</title>
+    <title>MINI MARKET - ახალციხე</title>
     <link rel="stylesheet" href="style.css">
+    <!-- FontAwesome იკონებისთვის (WhatsApp-ის ლოგოსთვის) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
-    <!-- ზედა საინფორმაციო ზოლი -->
-    <div class="top-bar">
-        <div class="container top-bar-content">
-            <div class="top-info">
-                <span><i class="fa-solid fa-location-dot"></i> ქ. ახალციხე, იაძის ქუჩა #2ი</span>
-                <span><i class="fa-solid fa-phone"></i> <a href="tel:+995500224822">+995 500 22 48 22</a></span>
-            </div>
-            <div class="top-badges">
-                <span><i class="fa-solid fa-earth-americas"></i> იმპორტი მსოფლიოს სხვადასხვა ქვეყნიდან</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- მთავარი ჰედერი -->
+    <!-- ჰედერი -->
     <header class="main-header">
         <div class="container header-container">
             <div class="logo">
-                <i class="fa-solid fa-store logo-icon"></i>
-                <div>
-                    <h1>MINI MARKET</h1>
-                    <span class="tagline">AKHALTSIKHE • PREMIUM SELECTION</span>
-                </div>
+                <h1>MINI MARKET</h1>
+                <span>ახალციხე</span>
             </div>
-            
-            <div class="header-actions">
-                <a href="https://wa.me/995500224822" target="_blank" class="whatsapp-btn">
-                    <i class="fa-brands fa-whatsapp"></i> WhatsApp დახმარება
-                </a>
+            <div class="header-info">
+                <p><i class="fa-solid fa-location-dot"></i> იაძის ქუჩა #2, ახალციხე</p>
+                <p><i class="fa-solid fa-phone"></i> <a href="tel:+995500224822">+995 500 22 48 22</a></p>
             </div>
         </div>
     </header>
 
     <!-- ბანერი -->
     <section class="hero-banner">
-        <div class="container hero-content">
-            <h2>საუკეთესო ადგილობრივი და იმპორტირებული პროდუქცია</h2>
-            <p>პროდუქცია ევროპიდან, აზიიდან და მსოფლიოს წამყვანი ქვეყნებიდან - ექსკლუზიურად ახალციხეში, იაძის #2ი-ში!</p>
-            <div class="hero-badges">
-                <span class="badge"><i class="fa-solid fa-gift"></i> ყოველკვირეული საჩუქრები</span>
-                <span class="badge"><i class="fa-solid fa-truck-fast"></i> ადგილზე მიწოდების სერვისი</span>
-            </div>
+        <div class="container">
+            <h2>საუკეთესო ფასები და ახალი პროდუქცია ყოველდღე!</h2>
+            <p>ეწვიეთ ჩვენს მარკეტს იაძის #2-ში ან დაგვიკავშირდით ცხელ ხაზზე.</p>
         </div>
     </section>
 
     <!-- პროდუქტების კატალოგი -->
     <main class="container catalog-section">
-        <div class="section-title">
-            <h2><i class="fa-solid fa-basket-shopping"></i> პროდუქცია & საჩუქრები</h2>
-            <p>იპოვეთ საპრიზო პროდუქტები და მოიგეთ საჩუქრები!</p>
-        </div>
-        
+        <h2 class="section-title">პროდუქცია</h2>
         <div id="product-list" class="products-grid">
-            <div class="loading-spinner">
-                <i class="fa-solid fa-circle-notch fa-spin"></i>
-                <p>პროდუქტები იტვირთება...</p>
-            </div>
+            <p class="loading-text">პროდუქტები იტვირთება...</p>
         </div>
     </main>
 
-    <!-- AI ასისტენტი - ჩატი -->
-    <div class="ai-widget">
-        <button id="ai-toggle-btn" class="ai-toggle-btn">
-            <i class="fa-solid fa-robot"></i>
-            <span>AI ასისტენტი</span>
-        </button>
-        
-        <div id="ai-chat-box" class="ai-chat-box hidden">
-            <div class="ai-chat-header">
-                <div class="ai-info">
-                    <i class="fa-solid fa-robot"></i>
-                    <div>
-                        <h4>MINI MARKET AI</h4>
-                        <span>ონლაინ ასისტენტი</span>
-                    </div>
-                </div>
-                <button id="ai-close-btn" class="close-btn">&times;</button>
-            </div>
-            <div id="ai-messages" class="ai-messages">
-                <div class="message ai-msg">
-                    გამარჯობა! 👋 მე ვარ MINI MARKET-ის AI ასისტენტი. როგორ შემიძლია დაგეხმაროთ? შეგიძლიათ მკითხოთ პროდუქტებზე, მისამართზე ან საპრიზო აქციებზე.
-                </div>
-            </div>
-            <div class="ai-input-area">
-                <input type="text" id="ai-input" placeholder="ჩაწერეთ კითხვა..." onkeydown="if(event.key==='Enter') sendAiMessage()">
-                <button onclick="sendAiMessage()"><i class="fa-solid fa-paper-plane"></i></button>
-            </div>
-        </div>
-    </div>
-
-    <!-- WhatsApp Floating Action -->
-    <a href="https://wa.me/995500224822" target="_blank" class="float-wa" title="WhatsApp დახმარება">
+    <!-- WhatsApp მცურავი ღილაკი -->
+    <a href="https://wa.me/995500224822?text=გამარჯობა,%20MINI%20MARKET!" class="whatsapp-float" target="_blank" title="WhatsApp დახმარება">
         <i class="fa-brands fa-whatsapp"></i>
     </a>
 
     <!-- ფუტერი -->
     <footer>
         <div class="container footer-content">
-            <div class="footer-col">
-                <h3>MINI MARKET</h3>
-                <p>თქვენი საყვარელი მარკეტი ახალციხეში. უმაღლესი ხარისხი და საუკეთესო ფასები.</p>
-            </div>
-            <div class="footer-col">
-                <h3>კონტაქტი</h3>
-                <p><i class="fa-solid fa-location-dot"></i> ქ. ახალციხე, იაძის ქუჩა #2</p>
-                <p><i class="fa-solid fa-phone"></i> +995 500 22 48 22</p>
-                <p><i class="fa-brands fa-whatsapp"></i> +995 500 22 48 22</p>
-            </div>
-            <div class="footer-col">
-                <h3>იმპორტი</h3>
-                <p>პროდუქცია სომხეთიდან, რუსეთიდან, აზერბაჯანიდან, თურქეთიდან და სხვა ქვეყნებიდან.</p>
-            </div>
-        </div>
-        <div class="footer-bottom">
             <p>&copy; 2026 MINI MARKET. ყველა უფლება დაცულია.</p>
+            <p>მისამართი: ქ. ახალციხე, იაძის ქუჩა #2 | ცხელი ხაზი: +995 500 22 48 22</p>
         </div>
     </footer>
 
