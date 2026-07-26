@@ -1,6 +1,6 @@
 [
   {
-    "name": "ლატინო ყავა სომხური",
+    "name": "ლატინო ყავა სომხური პრიზიანი",
     "price": 2.79,
     "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZ1p_o-oqDQyXTln-FLNtqi6s3erZOSdJ4OtB10DYb3GkJaiW52hlAvOg&s=10"
   },
@@ -65,7 +65,7 @@
   "imageUrl": "https://imageproxy.wolt.com/menu/menu-images/616f01cf9b23921bda3d8e03/6b0538a4-be12-11ef-ad29-9ee7f6cc40a5_4850021590068.jpg"
 },
   {
-  "name": "არაყი ხლებნაია რუსულო",
+  "name": "არაყი ხლებნაია რუსული",
   "price": 9.50,
   "imageUrl": "https://cdn.2nabiji.ge/products/araghki-khlebnaia-asobaia-300x300.webp"
 },
@@ -163,5 +163,15 @@
   "name": "პომიდორი ქართული 1კგ",
   "price": 1.99,
   "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSptgH-nrFMqkZulbQHpZbyT9XEK5jwZy8U3i_6efnEPxOeFfBEB9-7wd_b&s=10"
+},
+  {
+  "name": "კოკა-კოლა ქილა 150 მლ.",
+  "price": 0.99,
+  "imageUrl": "https://imageproxy.wolt.com/assets/68a2fbd53b13bfd3a588f764"
+},
+  {
+  "name": "ფანტა ქილა 150 მლ.",
+  "price": 0.99,
+  "imageUrl": "https://imageproxy.wolt.com/assets/68b982303c27c30f791be41b"
 }
 ]
