@@ -122,55 +122,6 @@ body {
     font-weight: bold;
 }
 
-/* Admin Section */
-.admin-section {
-    margin: 20px auto 40px;
-}
-
-#toggle-admin-btn {
-    background-color: #6c757d;
-    color: #fff;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.admin-panel {
-    background: #fff;
-    padding: 20px;
-    margin-top: 15px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-}
-
-.admin-panel.hidden {
-    display: none;
-}
-
-.admin-panel form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    max-width: 400px;
-}
-
-.admin-panel input {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-.admin-panel button {
-    background-color: #28a745;
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
 /* Footer */
 footer {
     background-color: #343a40;
