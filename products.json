@@ -153,5 +153,15 @@
   "name": "სუფრის მარილი",
   "price": 0.95,
   "imageUrl": "https://cdn.2nabiji.ge/products/marili-kg-300x300.webp"
+},
+  {
+  "name": "კიტრი ქართული 1კგ",
+  "price": 2.49,
+  "imageUrl": "https://mkurnali.ge/media/images/new_images/kitri-2.jpg"
+},
+  {
+  "name": "პომიდორი ქართული 1კგ",
+  "price": 1.99,
+  "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSptgH-nrFMqkZulbQHpZbyT9XEK5jwZy8U3i_6efnEPxOeFfBEB9-7wd_b&s=10"
 }
 ]
