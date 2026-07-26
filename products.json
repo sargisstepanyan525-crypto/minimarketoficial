@@ -68,5 +68,25 @@
   "name": "არაყი ხლებნაია რუსულო",
   "price": 9.50,
   "imageUrl": "https://cdn.2nabiji.ge/products/araghki-khlebnaia-asobaia-300x300.webp"
+},
+  {
+  "name": "მეზსუმზირა ოტ მარტინა ",
+  "price": 2.09,
+  "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRG1m6DKSMROzENsU3KRqdnXPabtE68ZLEyw9we2Deaww&s=10"
+},
+  {
+  "name": "მზესუმზირა ოტ მარტინა მარილიანი",
+  "price": 2.09,
+  "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0P_lgia-R6n2Fech6iwiewRV5klsm05IAIpdeVd7wXQ&s=10"
+},
+  {
+  "name": "მზესუმზირა მოლოდოჟნი",
+  "price": 1.10,
+  "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsY9XF0-OJ9seN5PCMP0guyrGFXHvfOHJsNhHW4JlW1I7dH96FqSkhot4&s=10"
+},
+  {
+  "name": "მზესუმზირა მოლოდოჟნი მარილიანი",
+  "price": 1.10,
+  "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmQoONyNoyufbgRkngo6Nm1CSZLyXECVzl7s-2zzi47A&s"
 }
 ]
