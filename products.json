@@ -43,5 +43,10 @@
   "name": "ქათმის ბარკალი უკრაინული",
   "price": 6.99,
   "imageUrl": "https://nikorasupermarket.ge/modules/current_promotions/uploads/3063.png"
+},
+  {
+  "name": "მაკარონი ერიშტა",
+  "price": 7.99,
+  "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQcxR8uIHYI9DhijiFqte1oL1eCjvOzENFVpXe1teAJ-29J09CskHYNcJQ&s=10"
 }
 ]
