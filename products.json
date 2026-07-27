@@ -258,5 +258,10 @@
   "name": "სამზარეულოს სალფეთქი",
   "price": 2.30,
   "imageUrl": "https://www.snowcompany.ge/images/thumbs/0000682_-6021_415.jpeg"
+},
+  {
+  "name": "სალფეტქი SUN",
+  "price": 0.99,
+  "imageUrl": "https://www.ekolari.ge/wp-content/uploads/2024/11/IMG_3547-Copy-scaled-1-430x568.jpg"
 }
 ]
