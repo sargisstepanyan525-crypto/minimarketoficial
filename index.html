@@ -9,7 +9,7 @@
 </head>
 <body>
 
-    <!-- სატესტო რეჟიმის შეტყობინება -->
+    <!-- სატესტო რეჟიმი -->
     <div class="test-notice">
         <i class="fa-solid fa-triangle-exclamation"></i> საიტი მუშაობს სატესტო რეჟიმში!
     </div>
@@ -24,21 +24,21 @@
                     <span>ახალციხე</span>
                 </div>
             </div>
-            
-            <!-- ჭკვიანი ძიება -->
+
+            <!-- ძიების ველი -->
             <div class="search-box">
                 <i class="fa-solid fa-magnifying-glass search-icon"></i>
                 <input type="text" id="search-input" placeholder="მოძებნეთ პროდუქტი...">
             </div>
 
             <div class="header-info">
-                <p><i class="fa-solid fa-location-dot"></i> იაძის ქუჩა #2</p>
+                <p><i class="fa-solid fa-location-dot"></i> იაძის ქუჩა #2ი</p>
                 <p><i class="fa-solid fa-phone"></i> <a href="tel:+995500224822">+995 500 22 48 22</a></p>
             </div>
         </div>
     </header>
 
-    <!-- მიწოდების პირობების ბანერი -->
+    <!-- მიწოდების ბანერი -->
     <section class="delivery-banner">
         <div class="container delivery-cards">
             <div class="delivery-card">
@@ -65,7 +65,7 @@
         </div>
     </section>
 
-    <!-- მთავარი კონტენტი -->
+    <!-- მთავარი კატალოგი -->
     <main class="container catalog-section">
         <h2 class="section-title">პროდუქცია</h2>
         <div id="product-list" class="products-grid">
@@ -74,41 +74,41 @@
     </main>
 
     <!-- კალათის მცურავი ღილაკი -->
-    <button class="cart-float-btn" onclick="toggleCart()">
+    <button class="cart-float-btn" id="open-cart-btn">
         <i class="fa-solid fa-cart-shopping"></i>
         <span id="cart-count">0</span>
     </button>
 
-    <!-- შეკვეთისა და კალათის ფანჯარა (Modal) -->
+    <!-- კალათის ფანჯარა -->
     <div id="cart-modal" class="cart-modal">
         <div class="cart-content">
             <div class="cart-header">
                 <h3><i class="fa-solid fa-basket-shopping"></i> თქვენი კალათა</h3>
-                <span class="close-btn" onclick="toggleCart()">&times;</span>
+                <span class="close-btn" id="close-cart-btn">&times;</span>
             </div>
             
             <div id="cart-items" class="cart-items">
-                <!-- კალათის ნივთები -->
+                <p>კალათა ცარიელია</p>
             </div>
 
             <div class="checkout-form">
                 <h4>მიწოდების დეტალები</h4>
                 
                 <label>მიწოდების ზონა:</label>
-                <select id="delivery-zone" onchange="updateTotal()">
+                <select id="delivery-zone">
                     <option value="3">ქ. ახალციხე (+3.00 ₾)</option>
                     <option value="10">ახლომდებარე სოფელი (+10.00 ₾)</option>
                     <option value="20">შორს მდებარე სოფელი (+20.00 ₾)</option>
                 </select>
 
-                <input type="text" id="customer-name" placeholder="თქვენი სახელი და გვარი" required>
-                <input type="text" id="customer-address" placeholder="ზუსტი მისამართი" required>
+                <input type="text" id="customer-name" placeholder="თქვენი სახელი და გვარი">
+                <input type="text" id="customer-address" placeholder="ზუსტი მისამართი">
 
                 <div class="payment-info">
                     <strong><i class="fa-solid fa-credit-card"></i> გადახდა ბარათით:</strong>
                     <p>ლიბერთი ბანკი (Liberty Bank)</p>
                     <code id="iban-code">GE46LB0711133103178000</code>
-                    <button class="copy-btn" onclick="copyIBAN()"><i class="fa-regular fa-copy"></i> ანგარიშის კოპირება</button>
+                    <button type="button" class="copy-btn" id="copy-iban-btn"><i class="fa-regular fa-copy"></i> ანგარიშის კოპირება</button>
                 </div>
 
                 <div class="cart-summary">
@@ -117,7 +117,7 @@
                     <h3>სულ გადასახდელი: <span id="final-price">0.00</span> ₾</h3>
                 </div>
 
-                <button class="send-order-btn" onclick="sendOrder()">
+                <button type="button" class="send-order-btn" id="send-order-btn">
                     <i class="fa-brands fa-whatsapp"></i> შეკვეთის გაგზავნა WhatsApp-ზე
                 </button>
             </div>
@@ -128,7 +128,7 @@
     <footer>
         <div class="container footer-content">
             <p>&copy; 2026 MINI MARKET. ყველა უფლება დაცულია.</p>
-            <p>მისამართი: ქ. ახალციხე, იაძის ქუჩა #2 | 📞 +995 500 22 48 22</p>
+            <p>მისამართი: ქ. ახალციხე, იაძის ქუჩა #2ი | 📞 +995 500 22 48 22</p>
         </div>
     </footer>
 
