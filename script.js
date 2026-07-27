@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById('product-list').innerHTML = '<p style="color:red;">შეცდომა პროდუქტების ჩატვირთვისას.</p>';
         });
 
-    // 2. ძიების ფუნქციონალი
+    // 2. ძიება
     const searchInput = document.getElementById('search-input');
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
@@ -24,18 +24,20 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // 3. კალათის გახსნა/დახურვა
+    // 3. კალათის მოვლენები
     document.getElementById('open-cart-btn').addEventListener('click', toggleCart);
     document.getElementById('close-cart-btn').addEventListener('click', toggleCart);
-
-    // 4. მიწოდების ზონის შეცვლა
     document.getElementById('delivery-zone').addEventListener('change', updateTotal);
-
-    // 5. ბანკის ანგარიშის კოპირება
     document.getElementById('copy-iban-btn').addEventListener('click', copyIBAN);
-
-    // 6. შეკვეთის გაგზავნა
     document.getElementById('send-order-btn').addEventListener('click', sendOrder);
+
+    // 4. AI ასისტენტის მოვლენები
+    document.getElementById('open-ai-btn').addEventListener('click', toggleAIChat);
+    document.getElementById('close-ai-btn').addEventListener('click', toggleAIChat);
+    document.getElementById('ai-send-btn').addEventListener('click', handleAISend);
+    document.getElementById('ai-user-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleAISend();
+    });
 });
 
 // პროდუქტების გამოჩენა
@@ -63,7 +65,6 @@ function renderProducts(products) {
     });
 }
 
-// კალათაში დამატება
 function addToCart(index) {
     const product = allProducts[index];
     if (!product) return;
@@ -81,7 +82,6 @@ function addToCart(index) {
     updateCartUI();
 }
 
-// კალათის განახლება
 function updateCartUI() {
     const countEl = document.getElementById('cart-count');
     const itemsEl = document.getElementById('cart-items');
@@ -115,7 +115,6 @@ function updateCartUI() {
     updateTotal();
 }
 
-// რაოდენობის შეცვლა კალათაში
 function changeQty(index, delta) {
     if (cart[index]) {
         cart[index].qty += delta;
@@ -126,13 +125,11 @@ function changeQty(index, delta) {
     }
 }
 
-// ჯამის დაანგარიშება
 function updateTotal() {
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
     const zoneSelect = document.getElementById('delivery-zone');
     let deliveryCost = Number(zoneSelect.value);
 
-    // 250 ₾-ზე მეტი შენაძენისას უფასოა
     if (subtotal >= 250) {
         deliveryCost = 0;
     }
@@ -144,13 +141,11 @@ function updateTotal() {
     document.getElementById('final-price').innerText = finalTotal.toFixed(2);
 }
 
-// კალათის გახსნა/დახურვა
 function toggleCart() {
     const modal = document.getElementById('cart-modal');
     modal.classList.toggle('show');
 }
 
-// IBAN-ის კოპირება
 function copyIBAN() {
     const iban = document.getElementById('iban-code').innerText;
     navigator.clipboard.writeText(iban).then(() => {
@@ -158,8 +153,21 @@ function copyIBAN() {
     });
 }
 
-// WhatsApp-ზე შეკვეთის გაგზავნა
+// შემოწმება: არის თუ არა სამუშაო საათები (10:00 - 18:00)
+function isWorkingHours() {
+    const now = new Date();
+    const currentHour = now.getHours();
+    return currentHour >= 10 && currentHour < 18;
+}
+
+// შეკვეთის გაგზავნა
 function sendOrder() {
+    // 1. თუ არასამუშაო საათებია (18:00 - 10:00), ბლოკავს გადამისამართებას
+    if (!isWorkingHours()) {
+        alert("⛔ ბოდიშს გიხდით! მაღაზია ამჟამად დაკეტილია.\n\nონლაინ შეკვეთების მიღება და WhatsApp-ზე გადამისამართება ხდება მხოლოდ 10:00-დან 18:00 საათამდე.\n\nგთხოვთ გვეწვიოთ დილით ან მოხვიდეთ ადგილზე: იაძის ქუჩა #2.");
+        return;
+    }
+
     if (cart.length === 0) {
         alert("გთხოვთ, ჯერ დაამატოთ პროდუქტი კალათაში!");
         return;
@@ -194,4 +202,59 @@ function sendOrder() {
 
     const url = `https://wa.me/995500224822?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
+}
+
+// ================= AI ჩატის ფუნქციონალი =================
+
+function toggleAIChat() {
+    const modal = document.getElementById('ai-chat-modal');
+    modal.classList.toggle('show');
+}
+
+let aiStep = 0;
+
+function handleAISend() {
+    const inputEl = document.getElementById('ai-user-input');
+    const msg = inputEl.value.trim();
+    if (!msg) return;
+
+    appendAIMessage(msg, 'user');
+    inputEl.value = '';
+
+    setTimeout(() => {
+        generateAIResponse(msg);
+    }, 600);
+}
+
+function appendAIMessage(text, sender) {
+    const container = document.getElementById('ai-messages');
+    const div = document.createElement('div');
+    div.className = `ai-msg ${sender}`;
+    div.innerText = text;
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+}
+
+// AI პასუხები - ბევრი კითხვა, რომ მყიდველი მაღაზიაში მოვიდეს
+function generateAIResponse(userText) {
+    if (!isWorkingHours()) {
+        appendAIMessage("⛔ ამჟამად არასამუშაო საათებია. მაღაზია მუშაობს 10:00-დან 18:00 საათამდე. ონლაინ შეკვეთები მიიღება მხოლოდ სამუშაო დროში. გთხოვთ გვეწვიოთ დილით იაძის #2-ში!", 'bot');
+        return;
+    }
+
+    aiStep++;
+
+    const questions = [
+        "ონლაინ შეკვეთის გაფორმებამდე რამდენიმე დეტალი უნდა დავაზუსტოთ: ზუსტად რომელი ბრენდის და წონის პროდუქტები გსურთ?",
+        "გასაგებია. ასევე, გთხოვთ მიუთითოთ ვარგისიანობის რა მინიმალური ვადა გსურთ ჰქონდეს პროდუქტს და გესაჭიროებათ თუ არა სპეციალური შეფუთვა?",
+        "მიღებულია. ხომ ვერ დააზუსტებთ, კურიერს რა დროის შუალედში შეუძლია მოსვლა (მაგალითად 12:00-13:00 თუ 15:00-16:00) და გექნებათ თუ არა ზუსტი ხურდა ადგილზე?",
+        "მადლობა. ასევე გვაცნობეთ, პროდუქციის ადგილზე ჩანაცვლება თუ დასაშვებია, თუ რომელიმე პოზიცია არ აღმოჩნდება საწყობში?",
+        "ონლაინ შეკვეთის პროცესი საკმაოდ დეტალურ გადამოწმებას მოითხოვს. 💡 *ჩვენი რჩევაა, პირდაპირ მობრძანდეთ მაღაზიაში (იაძის ქუჩა #2)* — ადგილზე ბევრად მარტივად, სწრაფად და დაუყოვნებლივ აირჩევთ ყველაფერს!"
+    ];
+
+    if (aiStep <= questions.length) {
+        appendAIMessage(questions[aiStep - 1], 'bot');
+    } else {
+        appendAIMessage("საუკეთესო და ყველაზე სწრაფი გზაა გვეწვიოთ მისამართზე: ქ. ახალციხე, იაძის ქუჩა #2. გელოდებით!", 'bot');
+    }
 }
