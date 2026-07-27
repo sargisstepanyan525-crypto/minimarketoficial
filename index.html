@@ -24,41 +24,48 @@
                     <span>ახალციხე</span>
                 </div>
             </div>
+            
+            <!-- ჭკვიანი ძიება -->
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="search-input" placeholder="მოძებნეთ პროდუქტი...">
+            </div>
+
             <div class="header-info">
-                <p><i class="fa-solid fa-location-dot"></i> იაძის ქუჩა #2, ახალციხე</p>
+                <p><i class="fa-solid fa-location-dot"></i> იაძის ქუჩა #2</p>
                 <p><i class="fa-solid fa-phone"></i> <a href="tel:+995500224822">+995 500 22 48 22</a></p>
             </div>
         </div>
     </header>
 
-    <!-- მიწოდების სერვისის სექცია -->
+    <!-- მიწოდების პირობების ბანერი -->
     <section class="delivery-banner">
-        <div class="container">
+        <div class="container delivery-cards">
             <div class="delivery-card">
-                <i class="fa-solid fa-truck-fast delivery-icon"></i>
-                <div class="delivery-details">
-                    <h3><i class="fa-solid fa-box"></i> მიწოდების სერვისი:</h3>
-                    <ul>
-                        <li>📍 <strong>ქ. ახალციხე:</strong> 3 - 6 ₾</li>
-                        <li>🏡 <strong>სოფლებში:</strong> 10 - 20 ₾</li>
-                        <li>🎉 <strong>250 ₾-ზე მეტ შენაძენზე:</strong> <span class="free-badge">უფასო!</span></li>
-                    </ul>
+                <i class="fa-solid fa-truck-fast"></i>
+                <div>
+                    <strong>ქ. ახალციხე</strong>
+                    <p>მიწოდება 3 - 6 ₾</p>
+                </div>
+            </div>
+            <div class="delivery-card">
+                <i class="fa-solid fa-tree"></i>
+                <div>
+                    <strong>სოფლები</strong>
+                    <p>მიწოდება 10 - 20 ₾</p>
+                </div>
+            </div>
+            <div class="delivery-card highlight">
+                <i class="fa-solid fa-gift"></i>
+                <div>
+                    <strong>250 ₾+ შენაძენზე</strong>
+                    <p>მიწოდება უფასოა!</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ძიების სექცია -->
-    <section class="search-section">
-        <div class="container">
-            <div class="search-box">
-                <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <input type="text" id="search-input" placeholder="მოძებნეთ პროდუქტი (მაგ: ყავა, ზეთი...)" onkeyup="filterProducts()">
-            </div>
-        </div>
-    </section>
-
-    <!-- პროდუქტების კატალოგი -->
+    <!-- მთავარი კონტენტი -->
     <main class="container catalog-section">
         <h2 class="section-title">პროდუქცია</h2>
         <div id="product-list" class="products-grid">
@@ -66,36 +73,62 @@
         </div>
     </main>
 
-    <!-- AI ასისტენტის მცურავი ღილაკი -->
-    <div class="ai-assistant-btn" onclick="toggleAIChat()" title="AI ასისტენტი">
-        <i class="fa-solid fa-robot"></i>
-    </div>
+    <!-- კალათის მცურავი ღილაკი -->
+    <button class="cart-float-btn" onclick="toggleCart()">
+        <i class="fa-solid fa-cart-shopping"></i>
+        <span id="cart-count">0</span>
+    </button>
 
-    <!-- AI ჩატის ფანჯარა -->
-    <div id="ai-chat-box" class="ai-chat-container">
-        <div class="ai-chat-header">
-            <span><i class="fa-solid fa-robot"></i> AI ასისტენტი (Beta)</span>
-            <span class="close-chat" onclick="toggleAIChat()">&times;</span>
-        </div>
-        <div class="ai-chat-body">
-            <p>გამარჯობა! 👋 მე ვარ MINI MARKET-ის AI ასისტენტი. რით შემიძლია დაგეხმაროთ?</p>
-        </div>
-        <div class="ai-chat-footer">
-            <input type="text" id="ai-input" placeholder="ჩაწერეთ კითხვა...">
-            <button onclick="sendAIMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+    <!-- შეკვეთისა და კალათის ფანჯარა (Modal) -->
+    <div id="cart-modal" class="cart-modal">
+        <div class="cart-content">
+            <div class="cart-header">
+                <h3><i class="fa-solid fa-basket-shopping"></i> თქვენი კალათა</h3>
+                <span class="close-btn" onclick="toggleCart()">&times;</span>
+            </div>
+            
+            <div id="cart-items" class="cart-items">
+                <!-- კალათის ნივთები -->
+            </div>
+
+            <div class="checkout-form">
+                <h4>მიწოდების დეტალები</h4>
+                
+                <label>მიწოდების ზონა:</label>
+                <select id="delivery-zone" onchange="updateTotal()">
+                    <option value="3">ქ. ახალციხე (+3.00 ₾)</option>
+                    <option value="10">ახლომდებარე სოფელი (+10.00 ₾)</option>
+                    <option value="20">შორს მდებარე სოფელი (+20.00 ₾)</option>
+                </select>
+
+                <input type="text" id="customer-name" placeholder="თქვენი სახელი და გვარი" required>
+                <input type="text" id="customer-address" placeholder="ზუსტი მისამართი" required>
+
+                <div class="payment-info">
+                    <strong><i class="fa-solid fa-credit-card"></i> გადახდა ბარათით:</strong>
+                    <p>ლიბერთი ბანკი (Liberty Bank)</p>
+                    <code id="iban-code">GE46LB0711133103178000</code>
+                    <button class="copy-btn" onclick="copyIBAN()"><i class="fa-regular fa-copy"></i> ანგარიშის კოპირება</button>
+                </div>
+
+                <div class="cart-summary">
+                    <p>პროდუქტები: <span id="subtotal-price">0.00</span> ₾</p>
+                    <p>მიწოდება: <span id="delivery-price">3.00</span> ₾</p>
+                    <h3>სულ გადასახდელი: <span id="final-price">0.00</span> ₾</h3>
+                </div>
+
+                <button class="send-order-btn" onclick="sendOrder()">
+                    <i class="fa-brands fa-whatsapp"></i> შეკვეთის გაგზავნა WhatsApp-ზე
+                </button>
+            </div>
         </div>
     </div>
-
-    <!-- WhatsApp მცურავი ღილაკი -->
-    <a href="https://wa.me/995500224822?text=გამარჯობა,%20MINI%20MARKET!" class="whatsapp-float" target="_blank" title="WhatsApp დახმარება">
-        <i class="fa-brands fa-whatsapp"></i>
-    </a>
 
     <!-- ფუტერი -->
     <footer>
         <div class="container footer-content">
             <p>&copy; 2026 MINI MARKET. ყველა უფლება დაცულია.</p>
-            <p>მისამართი: ქ. ახალციხე, იაძის ქუჩა #2 | ცხელი ხაზი: +995 500 22 48 22</p>
+            <p>მისამართი: ქ. ახალციხე, იაძის ქუჩა #2 | 📞 +995 500 22 48 22</p>
         </div>
     </footer>
 
