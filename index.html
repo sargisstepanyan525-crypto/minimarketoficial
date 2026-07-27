@@ -3,144 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini Market | მინი მარკეტი ახალციხეში</title>
-    
+    <title>Mini Market - მინი მარკეტი</title>
     <!-- Google Fonts & FontAwesome Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fira+GO:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- 1. Header & Navigation -->
-    <header class="navbar">
-        <div class="nav-container">
-            <div class="brand">
-                <div class="brand-logo">
-                    <i class="fa-solid fa-store"></i>
-                </div>
-                <div class="brand-info">
-                    <span class="brand-name">MINI MARKET</span>
-                    <span class="brand-tagline"><i class="fa-solid fa-location-dot"></i> ახალციხე, იაძის #2ი</span>
-                </div>
+    <!-- Top Luxury Announcement Bar -->
+    <div class="top-announcement-bar">
+        <div class="container announcement-content">
+            <div class="store-working-hours">
+                <i class="fa-solid fa-clock"></i> სამუშაო საათები: <strong>10:00 - 18:00</strong> | <i class="fa-solid fa-location-dot"></i> ახალციხე, იაძის ქუჩა #2
             </div>
-
-            <!-- Global Search Bar -->
-            <div class="search-box">
-                <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <input type="text" id="search-input" placeholder="მოძებნეთ პროდუქტი (მაგ. პური, რძე)...">
-            </div>
-
-            <!-- Floating Cart Trigger Button -->
-            <button id="open-cart-btn" class="cart-trigger">
-                <div class="cart-icon-wrapper">
-                    <i class="fa-solid fa-bag-shopping"></i>
-                    <span id="cart-count" class="badge">0</span>
-                </div>
-                <span class="cart-btn-label">კალათა</span>
-            </button>
-        </div>
-    </header>
-
-    <!-- 2. Hero Announcement Banner -->
-    <section class="hero-banner">
-        <div class="hero-content">
-            <div class="status-badge pulse">
-                <span class="dot"></span> სამუშაო საათები: 10:00 - 18:00
-            </div>
-            <h1>სწრაფი და ახალი პროდუქტები თქვენს კართან! 🛒</h1>
-            <p>შეუკვეთეთ მარტივად AI ასისტენტის დახმარებით. უფასო მიწოდება 250₾-ზე ზემოთ!</p>
-        </div>
-    </section>
-
-    <!-- 3. Main Product Showcase Grid -->
-    <main class="main-container">
-        <div class="section-header">
-            <h2><i class="fa-solid fa-fire text-gradient"></i> პოპულარული პროდუქცია</h2>
-            <span class="sub-text">საუკეთესო ხარისხი და გარანტირებული სიახლე</span>
-        </div>
-
-        <div id="product-list" class="product-grid">
-            <!-- Products Loaded Dynamically via JS -->
-            <div class="loading-skeleton">
-                <i class="fa-solid fa-circle-notch fa-spin"></i> პროდუქტები იტვირთება...
-            </div>
-        </div>
-    </main>
-
-    <!-- 4. Interactive Checkout Modal & AI Chat -->
-    <div id="checkout-modal" class="modal-overlay">
-        <div class="modal-card">
-            
-            <div class="modal-header">
-                <div class="modal-title">
-                    <i class="fa-solid fa-robot text-gradient"></i> AI შეკვეთის ასისტენტი
-                </div>
-                <button id="close-modal-btn" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-
-            <div class="modal-body">
-                <!-- Cart Summary Side Panel -->
-                <div class="cart-summary-panel">
-                    <h3><i class="fa-solid fa-cart-shopping"></i> თქვენი კალათა</h3>
-                    <div id="cart-items-container" class="cart-items-scroll">
-                        <!-- Dynamic Cart Items -->
-                    </div>
-
-                    <div class="checkout-financials">
-                        <div class="financial-row">
-                            <span>პროდუქცია:</span>
-                            <span><strong id="subtotal-price">0.00</strong> ₾</span>
-                        </div>
-                        <div class="financial-row">
-                            <span>მიწოდება (<span id="zone-label">ქალაქი</span>):</span>
-                            <span><strong id="delivery-price">6.00</strong> ₾</span>
-                        </div>
-                        <div class="financial-row total-row">
-                            <span>სულ გადასახდელი:</span>
-                            <span class="total-price"><strong id="final-price">0.00</strong> ₾</span>
-                        </div>
-                    </div>
-
-                    <!-- Payment Bank Details Accordion -->
-                    <div class="bank-card-box">
-                        <div class="bank-title"><i class="fa-solid fa-building-columns"></i> საბანკო ანგარიში</div>
-                        <div class="iban-wrapper">
-                            <span id="iban-code">GE46LB0711133103178000</span>
-                            <button id="copy-iban-btn" title="აკოპირება"><i class="fa-regular fa-copy"></i></button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Interactive AI Chat Panel -->
-                <div class="ai-chat-panel">
-                    <div id="ai-messages-box" class="chat-flow">
-                        <!-- Dynamic AI Messages -->
-                    </div>
-
-                    <div id="ai-input-wrapper" class="chat-input-area">
-                        <input type="text" id="ai-user-input" placeholder="ჩაშალეთ პასუხი აქ..." autocomplete="off">
-                        <button id="ai-send-btn" class="send-btn">
-                            <i class="fa-solid fa-paper-plane"></i>
-                        </button>
-                    </div>
-
-                    <button id="whatsapp-final-btn" class="whatsapp-btn hidden">
-                        <i class="fa-brands fa-whatsapp"></i> შეკვეთის გაგზავნა WhatsApp-ზე
-                    </button>
-                </div>
-
+            <div class="header-phones">
+                <span class="phone-label"><i class="fa-solid fa-headset"></i> ცხელი ხაზი:</span>
+                <a href="tel:+995500224822" class="phone-link"><i class="fa-solid fa-phone"></i> +995 500 22 48 22</a>
+                <span class="phone-divider">|</span>
+                <a href="tel:+995555738891" class="phone-link"><i class="fa-solid fa-phone"></i> +995 555 73 88 91</a>
             </div>
         </div>
     </div>
 
-    <!-- 5. Footer -->
-    <footer class="footer">
-        <p>© 2026 MINI MARKET. ყველა უფლება დაცულია. | ახალციხე, იაძის ქუჩა #2ი</p>
+    <!-- Main Navigation Header -->
+    <header class="main-header">
+        <div class="container header-wrapper">
+            <a href="#" class="brand-logo">
+                <div class="logo-icon"><i class="fa-solid fa-basket-shopping"></i></div>
+                <div class="logo-text">
+                    <span class="brand-name">MINI MARKET</span>
+                    <span class="brand-tagline">PREMIUM CONVENIENCE</span>
+                </div>
+            </a>
+
+            <div class="search-bar-wrapper">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="search-input" placeholder="მოძებნეთ პროდუქტი (მაგ: პური, რძე, ყველი)...">
+            </div>
+
+            <div class="header-actions">
+                <button id="open-cart-btn" class="cart-btn">
+                    <div class="cart-icon-wrapper">
+                        <i class="fa-solid fa-bag-shopping"></i>
+                        <span id="cart-count" class="cart-badge">0</span>
+                    </div>
+                    <div class="cart-btn-text">
+                        <span class="cart-title">კალათა</span>
+                        <span class="cart-total-preview"><span id="cart-total-header">0.00</span> ₾</span>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Showcase Section -->
+    <section class="hero-section">
+        <div class="container hero-container">
+            <div class="hero-badge"><i class="fa-solid fa-sparkles"></i> სწრაფი და საიმედო მიწოდება</div>
+            <h1 class="hero-title">საუკეთესო ხარისხის პროდუქტები პირდაპირ თქვენს კართან</h1>
+            <p class="hero-subtitle">ახალი ხორცპროდუქტები, რძის ნაწარმი, პურ-ფუნთუშეული და ყოველდღიური საჭიროების ნივთები ახალციხეში.</p>
+            
+            <div class="hero-features">
+                <div class="feature-item">
+                    <i class="fa-solid fa-truck-fast"></i>
+                    <div>
+                        <strong>ქალაქის მიწოდება</strong>
+                        <p>3 ₾ (250₾-ზე უფასო)</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <i class="fa-solid fa-house-chimney"></i>
+                    <div>
+                        <strong>სოფლის მიწოდება</strong>
+                        <p>8 ₾ (250₾-ზე უფასო)</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <i class="fa-solid fa-robot"></i>
+                    <div>
+                        <strong>AI ასისტენტი</strong>
+                        <p>ავტომატური შეკვეთა</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content Area -->
+    <main class="container main-content">
+        <div class="section-header">
+            <div>
+                <h2 class="section-title">პროდუქციის კატალოგი</h2>
+                <p class="section-desc">გამოიკვლიეთ ჩვენი ახალი პროდუქციის ასორტიმენტი</p>
+            </div>
+        </div>
+
+        <!-- Product Grid -->
+        <div id="product-list" class="product-grid">
+            <div class="loading-spinner">
+                <i class="fa-solid fa-circle-notch fa-spin"></i> პროდუქტები ტვირთება...
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="main-footer">
+        <div class="container footer-content">
+            <div class="footer-col">
+                <div class="brand-logo footer-logo">
+                    <div class="logo-icon"><i class="fa-solid fa-basket-shopping"></i></div>
+                    <div class="logo-text">
+                        <span class="brand-name">MINI MARKET</span>
+                    </div>
+                </div>
+                <p class="footer-about">თქვენი საიმედო უბნის მარკეტი ახალციხეში. უმაღლესი ხარისხის პროდუქტები და კომფორტული მიწოდების სერვისი.</p>
+            </div>
+            
+            <div class="footer-col">
+                <h4 class="footer-heading">საკონტაქტო ინფორმაცია</h4>
+                <ul class="footer-contact-list">
+                    <li><i class="fa-solid fa-location-dot"></i> ახალციხე, იაძის ქუჩა #2ი</li>
+                    <li><i class="fa-solid fa-phone"></i> +995 500 22 48 22</li>
+                    <li><i class="fa-solid fa-phone"></i> +995 555 73 88 91</li>
+                    <li><i class="fa-solid fa-clock"></i> ყოველდღე: 10:00 - 18:00</li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4 class="footer-heading">საბანკო რეკვიზიტები</h4>
+                <div class="iban-card">
+                    <span class="iban-title">ლიბერთი ბანკი (LIBETY BANK)</span>
+                    <div class="iban-code-box">
+                        <code id="iban-code">GE46LB0711133103178000</code>
+                        <button id="copy-iban-btn" title="აკოპირებს ანგარიშის ნომერს"><i class="fa-regular fa-copy"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <p>© 2026 MINI MARKET. ყველა უფლება დაცულია.</p>
+            </div>
+        </div>
     </footer>
+
+    <!-- AI Checkout & Cart Modal Overlay -->
+    <div id="checkout-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fa-solid fa-robot"></i> AI ასისტენტი - შეკვეთის გაფორმება
+                </div>
+                <button id="close-modal-btn" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="modal-body-split">
+                <!-- Cart Summary -->
+                <div class="cart-summary-column">
+                    <h3 class="column-title"><i class="fa-solid fa-cart-flatbed"></i> თქვენი კალათა</h3>
+                    <div id="cart-items-container" class="cart-items-list"></div>
+
+                    <div class="cart-billing-box">
+                        <div class="bill-line">
+                            <span>პროდუქცია:</span>
+                            <span class="bill-val"><span id="subtotal-price">0.00</span> ₾</span>
+                        </div>
+                        <div class="bill-line">
+                            <span>მიწოდების საფასური:</span>
+                            <span class="bill-val"><span id="delivery-price">3.00</span> ₾</span>
+                        </div>
+                        <div class="bill-line total">
+                            <span>სულ გადასახდელი:</span>
+                            <span class="bill-val highlight"><span id="final-price">0.00</span> ₾</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Chat Column -->
+                <div class="ai-chat-column">
+                    <div id="ai-messages-box" class="chat-messages-container"></div>
+
+                    <div id="ai-input-wrapper" class="chat-input-area">
+                        <input type="text" id="ai-user-input" placeholder="ჩაწერთ პასუხი აქ..." autocomplete="off">
+                        <button id="ai-send-btn" class="send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+                    </div>
+
+                    <button id="whatsapp-final-btn" class="whatsapp-send-btn hidden">
+                        <i class="fa-brands fa-whatsapp"></i> შეკვეთის გაგზავნა WhatsApp-ზე
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
