@@ -1,5 +1,6 @@
 let allProducts = [];
 let cart = [];
+let pendingOrderData = null; // AI-სთვის მომზადებული შეკვეთის მონაცემები
 
 document.addEventListener("DOMContentLoaded", () => {
     // 1. პროდუქტების წაკითხვა products.json-დან
@@ -29,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('close-cart-btn').addEventListener('click', toggleCart);
     document.getElementById('delivery-zone').addEventListener('change', updateTotal);
     document.getElementById('copy-iban-btn').addEventListener('click', copyIBAN);
-    document.getElementById('send-order-btn').addEventListener('click', sendOrder);
+    document.getElementById('send-order-btn').addEventListener('click', processOrderWithAI);
 
     // 4. AI ასისტენტის მოვლენები
     document.getElementById('open-ai-btn').addEventListener('click', toggleAIChat);
@@ -160,14 +161,9 @@ function isWorkingHours() {
     return currentHour >= 10 && currentHour < 18;
 }
 
-// შეკვეთის გაგზავნა
-function sendOrder() {
-    // 1. თუ არასამუშაო საათებია (18:00 - 10:00), ბლოკავს გადამისამართებას
-    if (!isWorkingHours()) {
-        alert("⛔ ბოდიშს გიხდით! მაღაზია ამჟამად დაკეტილია.\n\nონლაინ შეკვეთების მიღება და WhatsApp-ზე გადამისამართება ხდება მხოლოდ 10:00-დან 18:00 საათამდე.\n\nგთხოვთ გვეწვიოთ დილით ან მოხვიდეთ ადგილზე: იაძის ქუჩა #2.");
-        return;
-    }
+// ================= AI ოპერატორის ლოგიკა =================
 
+function processOrderWithAI() {
     if (cart.length === 0) {
         alert("გთხოვთ, ჯერ დაამატოთ პროდუქტი კალათაში!");
         return;
@@ -186,25 +182,20 @@ function sendOrder() {
     if (subtotal >= 250) deliveryCost = 0;
     const finalTotal = subtotal + deliveryCost;
 
-    let text = `🛒 *ახალი შეკვეთა MINI MARKET-იდან!*\n\n`;
-    text += `👤 *მყიდველი:* ${name}\n`;
-    text += `📍 *მისამართი:* ${address}\n\n`;
-    text += `📦 *პროდუქტები:*\n`;
+    // შეკვეთის მონაცემების შენახვა AI-სთვის
+    pendingOrderData = {
+        name: name,
+        address: address,
+        items: [...cart],
+        subtotal: subtotal,
+        deliveryCost: deliveryCost,
+        finalTotal: finalTotal
+    };
 
-    cart.forEach(item => {
-        text += `• ${item.name} (${item.qty}ც) - ${(item.price * item.qty).toFixed(2)} ₾\n`;
-    });
-
-    text += `\n💰 *პროდუქტები:* ${subtotal.toFixed(2)} ₾`;
-    text += `\n🚚 *მიწოდება:* ${deliveryCost.toFixed(2)} ₾`;
-    text += `\n💵 *სულ გადასახდელი:* ${finalTotal.toFixed(2)} ₾\n\n`;
-    text += `💳 *გადახდა (ლიბერთი ბანკი):*\nGE46LB0711133103178000`;
-
-    const url = `https://wa.me/995500224822?text=${encodeURIComponent(text)}`;
-    window.open(url, '_blank');
+    // კალათის დახურვა და AI ჩატის გახსნა
+    toggleCart();
+    openAIChatWithContext();
 }
-
-// ================= AI ჩატის ფუნქციონალი =================
 
 function toggleAIChat() {
     const modal = document.getElementById('ai-chat-modal');
@@ -212,6 +203,24 @@ function toggleAIChat() {
 }
 
 let aiStep = 0;
+
+function openAIChatWithContext() {
+    const modal = document.getElementById('ai-chat-modal');
+    modal.classList.add('show');
+
+    const messagesContainer = document.getElementById('ai-messages');
+    messagesContainer.innerHTML = ''; // ჩატის გასუფთავება
+    aiStep = 0;
+
+    // არასამუშაო საათების შემოწმება (18:00 - 10:00)
+    if (!isWorkingHours()) {
+        appendAIMessage(`⛔ გამარჯობა ${pendingOrderData.name}!\n\nბოდიშს გიხდით, ამჟამად არასამუშაო საათებია. მაღაზია და ონლაინ მიწოდება მუშაობს მხოლოდ 10:00-დან 18:00 საათამდე.\n\nღამის საათებში შეკვეთები WhatsApp-ზე არ იგზავნება. გთხოვთ გვეწვიოთ დილით 10:00-დან ან მობრძანდეთ მაღაზიაში: იაძის ქუჩა #2.`, 'bot');
+        return;
+    }
+
+    // სამუშაო საათებში AI იწყებს შეკითხვის დასმას
+    appendAIMessage(`გამარჯობა ${pendingOrderData.name}! მივიღე თქვენი შეკვეთის განაცხადი (${pendingOrderData.finalTotal.toFixed(2)} ₾).\n\nსანამ შეკვეთას WhatsApp-ზე გადავაგზავნით, რამდენიმე აუცილებელი დეტალი უნდა დავაზუსტოთ: ხომ ვერ მიუთითებთ პროდუქციის კონკრეტულ ბრენდებს ან სპეც-მოთხოვნებს?`, 'bot');
+}
 
 function handleAISend() {
     const inputEl = document.getElementById('ai-user-input');
@@ -235,26 +244,24 @@ function appendAIMessage(text, sender) {
     container.scrollTop = container.scrollHeight;
 }
 
-// AI პასუხები - ბევრი კითხვა, რომ მყიდველი მაღაზიაში მოვიდეს
 function generateAIResponse(userText) {
     if (!isWorkingHours()) {
-        appendAIMessage("⛔ ამჟამად არასამუშაო საათებია. მაღაზია მუშაობს 10:00-დან 18:00 საათამდე. ონლაინ შეკვეთები მიიღება მხოლოდ სამუშაო დროში. გთხოვთ გვეწვიოთ დილით იაძის #2-ში!", 'bot');
+        appendAIMessage("⛔ ამჟამად არასამუშაო საათებია (18:00-10:00). შეკვეთა ვერ გაიგზავნება. გთხოვთ გვეწვიოთ დილით იაძის #2-ში!", 'bot');
         return;
     }
 
     aiStep++;
 
     const questions = [
-        "ონლაინ შეკვეთის გაფორმებამდე რამდენიმე დეტალი უნდა დავაზუსტოთ: ზუსტად რომელი ბრენდის და წონის პროდუქტები გსურთ?",
-        "გასაგებია. ასევე, გთხოვთ მიუთითოთ ვარგისიანობის რა მინიმალური ვადა გსურთ ჰქონდეს პროდუქტს და გესაჭიროებათ თუ არა სპეციალური შეფუთვა?",
-        "მიღებულია. ხომ ვერ დააზუსტებთ, კურიერს რა დროის შუალედში შეუძლია მოსვლა (მაგალითად 12:00-13:00 თუ 15:00-16:00) და გექნებათ თუ არა ზუსტი ხურდა ადგილზე?",
+        "გასაგებია. ასევე, გთხოვთ მიუთითოთ ვარგისიანობის რა მინიმალური ვადა გსურთ ჰქონდეს პროდუქტებს?",
+        "მიღებულია. ხომ ვერ დააზუსტებთ, კურიერს რა ზუსტ დროში შეუძლია მოსვლა და ექნება თუ არა ადგილზე ზუსტი ხურდა?",
         "მადლობა. ასევე გვაცნობეთ, პროდუქციის ადგილზე ჩანაცვლება თუ დასაშვებია, თუ რომელიმე პოზიცია არ აღმოჩნდება საწყობში?",
-        "ონლაინ შეკვეთის პროცესი საკმაოდ დეტალურ გადამოწმებას მოითხოვს. 💡 *ჩვენი რჩევაა, პირდაპირ მობრძანდეთ მაღაზიაში (იაძის ქუჩა #2)* — ადგილზე ბევრად მარტივად, სწრაფად და დაუყოვნებლივ აირჩევთ ყველაფერს!"
+        "ონლაინ შეკვეთის პროცესი საკმაოდ რთულ და ხანგრძლივ დაზუსტებას მოითხოვს.\n\n💡 *ჩვენი რჩევაა, პირდაპირ მობრძანდეთ მაღაზიაში (იაძის ქუჩა #2)* — ადგილზე ბევრად მარტივად, სწრაფად და დაუყოვნებლივ აირჩევთ ყველაფერს!"
     ];
 
     if (aiStep <= questions.length) {
         appendAIMessage(questions[aiStep - 1], 'bot');
     } else {
-        appendAIMessage("საუკეთესო და ყველაზე სწრაფი გზაა გვეწვიოთ მისამართზე: ქ. ახალციხე, იაძის ქუჩა #2ი. გელოდებით!", 'bot');
+        appendAIMessage("თუ მაინც გსურთ ონლაინ გაგზავნა, შეგიძლიათ დააჭიროთ ქვემოთ შეკვეთის დასრულებას, თუმცა მაღაზიაში ადგილზე მოსვლა ბევრად სწრაფია! 📍 იაძის ქუჩა #2", 'bot');
     }
 }
