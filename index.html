@@ -32,7 +32,7 @@
             </div>
 
             <div class="header-info">
-                <p><i class="fa-solid fa-location-dot"></i> იაძის ქუჩა #2ი</p>
+                <p><i class="fa-solid fa-location-dot"></i> იაძის ქუჩა #2</p>
                 <p><i class="fa-solid fa-phone"></i> <a href="tel:+995500224822">+995 500 22 48 22</a></p>
             </div>
         </div>
@@ -78,6 +78,30 @@
         <i class="fa-solid fa-cart-shopping"></i>
         <span id="cart-count">0</span>
     </button>
+
+    <!-- AI ოპერატორის მცურავი ღილაკი -->
+    <button class="ai-float-btn" id="open-ai-btn" title="AI ასისტენტი">
+        <i class="fa-solid fa-robot"></i>
+    </button>
+
+    <!-- AI ჩატის ფანჯარა -->
+    <div id="ai-chat-modal" class="ai-modal">
+        <div class="ai-chat-container">
+            <div class="ai-chat-header">
+                <div>
+                    <i class="fa-solid fa-robot"></i> <strong>AI ასისტენტი - MINI MARKET</strong>
+                </div>
+                <span class="close-btn" id="close-ai-btn">&times;</span>
+            </div>
+            <div id="ai-messages" class="ai-messages">
+                <div class="ai-msg bot">გამარჯობა! მე ვარ MINI MARKET-ის AI ასისტენტი. რით შემიძლია დაგეხმაროთ?</div>
+            </div>
+            <div class="ai-input-area">
+                <input type="text" id="ai-user-input" placeholder="ჩაწერეთ შეკითხვა...">
+                <button type="button" id="ai-send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
 
     <!-- კალათის ფანჯარა -->
     <div id="cart-modal" class="cart-modal">
@@ -128,7 +152,7 @@
     <footer>
         <div class="container footer-content">
             <p>&copy; 2026 MINI MARKET. ყველა უფლება დაცულია.</p>
-            <p>მისამართი: ქ. ახალციხე, იაძის ქუჩა #2ი | 📞 +995 500 22 48 22</p>
+            <p>მისამართი: ქ. ახალციხე, იაძის ქუჩა #2 | 📞 +995 500 22 48 22</p>
         </div>
     </footer>
 
