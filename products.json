@@ -205,8 +205,13 @@
   "imageUrl": "https://cdn.2nabiji.ge/products/shesqelebuli-rdzis-shemveli-produqti-eldorado-8-5-370gr-300x300.webp"
 },
   {
-  "name": "წიწიბურა ოლინპი",
+  "name": "წიწიბურა ოლინპი 0.8კგ",
   "price": 2.49,
   "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQP7CIj-i76IagC1nqAnlqCqqdpTSlGl-w0D1GlU1M-Qg&s"
+},
+  {
+  "name": "ბრინჯი ოლიმპი 0.8კგ",
+  "price": 2.59,
+  "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6vwN-ZrRvMzmsrh6byhmzkbRCejqMQDo8IaZqbtdkZA&s"
 }
 ]
