@@ -329,3 +329,10 @@ body {
 .hidden {
     display: none;
 }
+/* Red Error Bubble for Validation Failures */
+.chat-bubble.bot.error {
+    background-color: #fed7d7;
+    color: #9b2c2c;
+    border-left: 4px solid #e53e3e;
+    font-weight: 500;
+}
