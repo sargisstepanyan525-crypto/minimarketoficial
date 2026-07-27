@@ -1,9 +1,16 @@
 let allProducts = [];
 let cart = [];
-let pendingOrderData = null; // AI-სთვის მომზადებული შეკვეთის მონაცემები
+let customerData = {
+    fullName: '',
+    address: '',
+    idNumber: '',
+    phone: '',
+    notes: ''
+};
+let aiStep = 0;
 
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. პროდუქტების წაკითხვა products.json-დან
+    // 1. პროდუქტების ჩატვირთვა products.json-დან
     fetch('products.json?t=' + new Date().getTime())
         .then(res => res.json())
         .then(data => {
@@ -30,7 +37,9 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('close-cart-btn').addEventListener('click', toggleCart);
     document.getElementById('delivery-zone').addEventListener('change', updateTotal);
     document.getElementById('copy-iban-btn').addEventListener('click', copyIBAN);
-    document.getElementById('send-order-btn').addEventListener('click', processOrderWithAI);
+    
+    // კალათიდან პირდაპირ AI-ზე გადასვლა
+    document.getElementById('send-order-btn').addEventListener('click', startAIOrderProcess);
 
     // 4. AI ასისტენტის მოვლენები
     document.getElementById('open-ai-btn').addEventListener('click', toggleAIChat);
@@ -129,7 +138,7 @@ function changeQty(index, delta) {
 function updateTotal() {
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
     const zoneSelect = document.getElementById('delivery-zone');
-    let deliveryCost = Number(zoneSelect.value);
+    let deliveryCost = Number(zoneSelect ? zoneSelect.value : 0);
 
     if (subtotal >= 250) {
         deliveryCost = 0;
@@ -137,13 +146,22 @@ function updateTotal() {
 
     const finalTotal = subtotal + deliveryCost;
 
-    document.getElementById('subtotal-price').innerText = subtotal.toFixed(2);
-    document.getElementById('delivery-price').innerText = deliveryCost.toFixed(2);
-    document.getElementById('final-price').innerText = finalTotal.toFixed(2);
+    const subEl = document.getElementById('subtotal-price');
+    const delEl = document.getElementById('delivery-price');
+    const finEl = document.getElementById('final-price');
+
+    if (subEl) subEl.innerText = subtotal.toFixed(2);
+    if (delEl) delEl.innerText = deliveryCost.toFixed(2);
+    if (finEl) finEl.innerText = finalTotal.toFixed(2);
 }
 
 function toggleCart() {
     const modal = document.getElementById('cart-modal');
+    modal.classList.toggle('show');
+}
+
+function toggleAIChat() {
+    const modal = document.getElementById('ai-chat-modal');
     modal.classList.toggle('show');
 }
 
@@ -161,65 +179,37 @@ function isWorkingHours() {
     return currentHour >= 10 && currentHour < 18;
 }
 
-// ================= AI ოპერატორის ლოგიკა =================
+// ================= AI ოპერატორის პროცესი =================
 
-function processOrderWithAI() {
+function startAIOrderProcess() {
     if (cart.length === 0) {
         alert("გთხოვთ, ჯერ დაამატოთ პროდუქტი კალათაში!");
         return;
     }
 
-    const name = document.getElementById('customer-name').value.trim();
-    const address = document.getElementById('customer-address').value.trim();
-
-    if (!name || !address) {
-        alert("გთხოვთ, მიუთითოთ სახელი და მისამართი!");
-        return;
-    }
-
-    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-    let deliveryCost = Number(document.getElementById('delivery-zone').value);
-    if (subtotal >= 250) deliveryCost = 0;
-    const finalTotal = subtotal + deliveryCost;
-
-    // შეკვეთის მონაცემების შენახვა AI-სთვის
-    pendingOrderData = {
-        name: name,
-        address: address,
-        items: [...cart],
-        subtotal: subtotal,
-        deliveryCost: deliveryCost,
-        finalTotal: finalTotal
-    };
-
     // კალათის დახურვა და AI ჩატის გახსნა
     toggleCart();
-    openAIChatWithContext();
-}
-
-function toggleAIChat() {
-    const modal = document.getElementById('ai-chat-modal');
-    modal.classList.toggle('show');
-}
-
-let aiStep = 0;
-
-function openAIChatWithContext() {
+    
     const modal = document.getElementById('ai-chat-modal');
     modal.classList.add('show');
 
     const messagesContainer = document.getElementById('ai-messages');
     messagesContainer.innerHTML = ''; // ჩატის გასუფთავება
+    
+    // მონაცემების განახლება
     aiStep = 0;
+    customerData = { fullName: '', address: '', idNumber: '', phone: '', notes: '' };
 
     // არასამუშაო საათების შემოწმება (18:00 - 10:00)
     if (!isWorkingHours()) {
-        appendAIMessage(`⛔ გამარჯობა ${pendingOrderData.name}!\n\nბოდიშს გიხდით, ამჟამად არასამუშაო საათებია. მაღაზია და ონლაინ მიწოდება მუშაობს მხოლოდ 10:00-დან 18:00 საათამდე.\n\nღამის საათებში შეკვეთები WhatsApp-ზე არ იგზავნება. გთხოვთ გვეწვიოთ დილით 10:00-დან ან მობრძანდეთ მაღაზიაში: იაძის ქუჩა #2.`, 'bot');
+        appendAIMessage(`⛔ გამარჯობა!\n\nბოდიშს გიხდით, ამჟამად არასამუშაო საათებია. ონლაინ მიწოდების სერვისი მუშაობს მხოლოდ 10:00-დან 18:00 საათამდე.\n\nღამის საათებში შეკვეთები ვერ დამუშავდება. გთხოვთ გვეწვიოთ დილით 10:00 საათიდან ან მობრძანდეთ მაღაზიაში: **ახალციხე, იაძის ქუჩა #2**!`, 'bot');
         return;
     }
 
-    // სამუშაო საათებში AI იწყებს შეკითხვის დასმას
-    appendAIMessage(`გამარჯობა ${pendingOrderData.name}! მივიღე თქვენი შეკვეთის განაცხადი (${pendingOrderData.finalTotal.toFixed(2)} ₾).\n\nსანამ შეკვეთას WhatsApp-ზე გადავაგზავნით, რამდენიმე აუცილებელი დეტალი უნდა დავაზუსტოთ: ხომ ვერ მიუთითებთ პროდუქციის კონკრეტულ ბრენდებს ან სპეც-მოთხოვნებს?`, 'bot');
+    // სამუშაო საათებში AI იწყებს მონაცემების შეგროვებას
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+    appendAIMessage(`გამარჯობა! მე ვარ Mini Market-ის AI ოპერატორი. 🛒\n\nთქვენ აირჩიეთ პროდუქტები ჯამური ღირებულებით: **${subtotal.toFixed(2)} ₾**.\n\nშეკვეთის გასაფორმებლად, გთხოვთ მომწეროთ თქვენი **სახელი და გვარი**:`, 'bot');
+    aiStep = 1;
 }
 
 function handleAISend() {
@@ -231,8 +221,8 @@ function handleAISend() {
     inputEl.value = '';
 
     setTimeout(() => {
-        generateAIResponse(msg);
-    }, 600);
+        processAISteps(msg);
+    }, 500);
 }
 
 function appendAIMessage(text, sender) {
@@ -244,24 +234,66 @@ function appendAIMessage(text, sender) {
     container.scrollTop = container.scrollHeight;
 }
 
-function generateAIResponse(userText) {
+function processAISteps(userText) {
     if (!isWorkingHours()) {
         appendAIMessage("⛔ ამჟამად არასამუშაო საათებია (18:00-10:00). შეკვეთა ვერ გაიგზავნება. გთხოვთ გვეწვიოთ დილით იაძის #2-ში!", 'bot');
         return;
     }
 
-    aiStep++;
+    switch (aiStep) {
+        case 1:
+            customerData.fullName = userText;
+            appendAIMessage(`სასსიამოვნოა, ${customerData.fullName}! 👋\n\nახლა მიუთითეთ **ზუსტი მისამართი** სადაც გსურთ პროდუქციის მიწოდება:`, 'bot');
+            aiStep = 2;
+            break;
 
-    const questions = [
-        "გასაგებია. ასევე, გთხოვთ მიუთითოთ ვარგისიანობის რა მინიმალური ვადა გსურთ ჰქონდეს პროდუქტებს?",
-        "მიღებულია. ხომ ვერ დააზუსტებთ, კურიერს რა ზუსტ დროში შეუძლია მოსვლა და ექნება თუ არა ადგილზე ზუსტი ხურდა?",
-        "მადლობა. ასევე გვაცნობეთ, პროდუქციის ადგილზე ჩანაცვლება თუ დასაშვებია, თუ რომელიმე პოზიცია არ აღმოჩნდება საწყობში?",
-        "ონლაინ შეკვეთის პროცესი საკმაოდ რთულ და ხანგრძლივ დაზუსტებას მოითხოვს.\n\n💡 *ჩვენი რჩევაა, პირდაპირ მობრძანდეთ მაღაზიაში (იაძის ქუჩა #2)* — ადგილზე ბევრად მარტივად, სწრაფად და დაუყოვნებლივ აირჩევთ ყველაფერს!"
-    ];
+        case 2:
+            customerData.address = userText;
+            appendAIMessage(`მადლობა. გთხოვთ მომწეროთ თქვენი **პირადი ნომერი (11 ნიშნა)**:`, 'bot');
+            aiStep = 3;
+            break;
 
-    if (aiStep <= questions.length) {
-        appendAIMessage(questions[aiStep - 1], 'bot');
-    } else {
-        appendAIMessage("თუ მაინც გსურთ ონლაინ გაგზავნა, შეგიძლიათ დააჭიროთ ქვემოთ შეკვეთის დასრულებას, თუმცა მაღაზიაში ადგილზე მოსვლა ბევრად სწრაფია! 📍 იაძის ქუჩა #2", 'bot');
+        case 3:
+            customerData.idNumber = userText;
+            appendAIMessage(`გასაგებია. ახლა მიუთითეთ **მობილურის ტელეფონის ნომერი**:`, 'bot');
+            aiStep = 4;
+            break;
+
+        case 4:
+            customerData.phone = userText;
+            appendAIMessage(`გმადლობთ! დამატებით ხომ არ გაქვთ რაიმე სპეციალური მოთხოვნა ან შენიშვნა კურიერისთვის? (მაგ. ხურდის ქონა, პროდუქტის ბრენდი, შენახვის პირობები და ა.შ.)`, 'bot');
+            aiStep = 5;
+            break;
+
+        case 5:
+            customerData.notes = userText;
+            
+            // დამატებითი რთული შეკითხვები/რჩევა მაღაზიაში მოსვლაზე
+            appendAIMessage(`მონაცემები ჩაწერილია! 📝\n\nთუმცა, გაითვალისწინეთ, რომ ონლაინ შეკვეთას სჭირდება დრო, კურიერის ლოდინი და დეტალების შეთანხმება.\n\n💡 **ჩვენი რჩევაა, პირდაპირ მობრძანდეთ მაღაზიაში (ახალციხე, იაძის ქუჩა #2)** — ადგილზე ბევრად მარტივად, სწრაფად და დაუყოვნებლივ აირჩევთ ყველაფერს!`, 'bot');
+            aiStep = 6;
+            break;
+
+        case 6:
+            // საბოლოო დასტური
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            let itemsListStr = cart.map(i => `• ${i.name} (${i.qty}ც) - ${(i.price * i.qty).toFixed(2)}₾`).join('\n');
+            
+            let summaryMsg = `თუ მაინც გსურთ ონლაინ გაგზავნა, აი თქვენი შეკვეთის რეზიუმე:\n\n` +
+                `👤 მყიდველი: ${customerData.fullName}\n` +
+                `📍 მისამართი: ${customerData.address}\n` +
+                `🆔 პირადი №: ${customerData.idNumber}\n` +
+                `📞 ტელეფონი: ${customerData.phone}\n` +
+                `💬 შენიშვნა: ${customerData.notes}\n\n` +
+                `🛒 კალათა:\n${itemsListStr}\n` +
+                `💰 სულ: ${subtotal.toFixed(2)} ₾\n\n` +
+                `📍 მაღაზია: იაძის ქუჩა #2ი`;
+
+            appendAIMessage(summaryMsg, 'bot');
+            aiStep = 7;
+            break;
+
+        default:
+            appendAIMessage(`თქვენი მონაცემები მიღებულია! ონლაინ პროცესის დაყოვნების თავიდან ასაცილებლად გელით მაღაზიაში: **იაძის ქუჩა #2**! 🛍️`, 'bot');
+            break;
     }
 }
