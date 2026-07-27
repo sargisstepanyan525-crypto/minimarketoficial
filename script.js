@@ -255,6 +255,6 @@ function generateAIResponse(userText) {
     if (aiStep <= questions.length) {
         appendAIMessage(questions[aiStep - 1], 'bot');
     } else {
-        appendAIMessage("საუკეთესო და ყველაზე სწრაფი გზაა გვეწვიოთ მისამართზე: ქ. ახალციხე, იაძის ქუჩა #2. გელოდებით!", 'bot');
+        appendAIMessage("საუკეთესო და ყველაზე სწრაფი გზაა გვეწვიოთ მისამართზე: ქ. ახალციხე, იაძის ქუჩა #2ი. გელოდებით!", 'bot');
     }
 }
