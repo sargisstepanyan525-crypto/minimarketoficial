@@ -5,30 +5,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MINI MARKET - ახალციხე</title>
     <link rel="stylesheet" href="style.css">
-    <!-- FontAwesome იკონებისთვის (WhatsApp-ის ლოგოსთვის) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+
+    <!-- სატესტო რეჟიმის შეტყობინება -->
+    <div class="test-notice">
+        <i class="fa-solid fa-triangle-exclamation"></i> საიტი მუშაობს სატესტო რეჟიმში!
+    </div>
 
     <!-- ჰედერი -->
     <header class="main-header">
         <div class="container header-container">
             <div class="logo">
-                <h1>MINI MARKET</h1>
-                <span>ახალციხე</span>
+                <i class="fa-solid fa-basket-shopping logo-icon"></i>
+                <div class="logo-text">
+                    <h1>MINI MARKET</h1>
+                    <span>ახალციხე</span>
+                </div>
             </div>
             <div class="header-info">
-                <p><i class="fa-solid fa-location-dot"></i> იაძის ქუჩა #2ი, ახალციხე</p>
+                <p><i class="fa-solid fa-location-dot"></i> იაძის ქუჩა #2, ახალციხე</p>
                 <p><i class="fa-solid fa-phone"></i> <a href="tel:+995500224822">+995 500 22 48 22</a></p>
             </div>
         </div>
     </header>
 
-    <!-- ბანერი -->
-    <section class="hero-banner">
+    <!-- მიწოდების სერვისის სექცია -->
+    <section class="delivery-banner">
         <div class="container">
-            <h2>საუკეთესო ფასები და ახალი პროდუქცია ყოველდღე!</h2>
-            <p>ეწვიეთ ჩვენს მარკეტს იაძის #2ი-ში ივერიელის ქუჩის ასახვევზე ან დაგვიკავშირდით ცხელ ხაზზე.</p>
+            <div class="delivery-card">
+                <i class="fa-solid fa-truck-fast delivery-icon"></i>
+                <div class="delivery-details">
+                    <h3><i class="fa-solid fa-box"></i> მიწოდების სერვისი:</h3>
+                    <ul>
+                        <li>📍 <strong>ქ. ახალციხე:</strong> 3 - 6 ₾</li>
+                        <li>🏡 <strong>სოფლებში:</strong> 10 - 20 ₾</li>
+                        <li>🎉 <strong>250 ₾-ზე მეტ შენაძენზე:</strong> <span class="free-badge">უფასო!</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ძიების სექცია -->
+    <section class="search-section">
+        <div class="container">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="search-input" placeholder="მოძებნეთ პროდუქტი (მაგ: ყავა, ზეთი...)" onkeyup="filterProducts()">
+            </div>
         </div>
     </section>
 
@@ -40,6 +66,26 @@
         </div>
     </main>
 
+    <!-- AI ასისტენტის მცურავი ღილაკი -->
+    <div class="ai-assistant-btn" onclick="toggleAIChat()" title="AI ასისტენტი">
+        <i class="fa-solid fa-robot"></i>
+    </div>
+
+    <!-- AI ჩატის ფანჯარა -->
+    <div id="ai-chat-box" class="ai-chat-container">
+        <div class="ai-chat-header">
+            <span><i class="fa-solid fa-robot"></i> AI ასისტენტი (Beta)</span>
+            <span class="close-chat" onclick="toggleAIChat()">&times;</span>
+        </div>
+        <div class="ai-chat-body">
+            <p>გამარჯობა! 👋 მე ვარ MINI MARKET-ის AI ასისტენტი. რით შემიძლია დაგეხმაროთ?</p>
+        </div>
+        <div class="ai-chat-footer">
+            <input type="text" id="ai-input" placeholder="ჩაწერეთ კითხვა...">
+            <button onclick="sendAIMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
+
     <!-- WhatsApp მცურავი ღილაკი -->
     <a href="https://wa.me/995500224822?text=გამარჯობა,%20MINI%20MARKET!" class="whatsapp-float" target="_blank" title="WhatsApp დახმარება">
         <i class="fa-brands fa-whatsapp"></i>
@@ -49,7 +95,7 @@
     <footer>
         <div class="container footer-content">
             <p>&copy; 2026 MINI MARKET. ყველა უფლება დაცულია.</p>
-            <p>მისამართი: ქ. ახალციხე, იაძის ქუჩა #2ი | ცხელი ხაზი: +995 500 22 48 22</p>
+            <p>მისამართი: ქ. ახალციხე, იაძის ქუჩა #2 | ცხელი ხაზი: +995 500 22 48 22</p>
         </div>
     </footer>
 
