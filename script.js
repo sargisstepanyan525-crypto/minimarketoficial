@@ -1,29 +1,25 @@
 let allProducts = [];
 let cart = [];
 
-// AI დიალოგის მდგომარეობა
-let aiOrderData = {
-    cartItems: [],
-    subtotal: 0,
-    deliveryCost: 0,
-    finalTotal: 0,
+// AI კითხვარის ლოგიკური ეტაპები და მონაცემთა შეგროვება
+let currentStep = 0;
+let collectedData = {
     fullName: "",
+    personalId: "",
     phone: "",
-    address: "",
-    idNumber: "",
-    payMethod: "",
-    changeNeeded: "",
-    preferredTime: "",
-    replacementOk: "",
-    courierNote: "",
-    receiptType: "",
-    confirmed: false
+    cityAddress: "",
+    floorCode: "",
+    deliveryTime: "",
+    freshnessReq: "",
+    breadType: "",
+    allergyNotes: "",
+    replacementPolicy: "",
+    paymentMethod: "",
+    changeRequirement: ""
 };
 
-let currentQuestionStep = 0;
-
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. პროდუქტების ჩატვირთვა
+    // 1. პროდუქტების წამოღება
     fetch('products.json?t=' + new Date().getTime())
         .then(res => res.json())
         .then(data => {
@@ -40,30 +36,21 @@ document.addEventListener("DOMContentLoaded", () => {
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
             const query = e.target.value.toLowerCase().trim();
-            const filtered = allProducts.filter(p => p.name.toLowerCase().includes(query));
-            renderProducts(filtered);
+            renderProducts(allProducts.filter(p => p.name.toLowerCase().includes(query)));
         });
     }
 
-    // 3. კალათა და AI ჩატის ღილაკები
-    document.getElementById('open-cart-btn').addEventListener('click', toggleCart);
-    document.getElementById('close-cart-btn').addEventListener('click', toggleCart);
-    document.getElementById('delivery-zone').addEventListener('change', updateTotal);
+    // 3. მოვლენები
+    document.getElementById('open-cart-btn').addEventListener('click', openCheckoutModal);
+    document.getElementById('close-modal-btn').addEventListener('click', closeCheckoutModal);
     document.getElementById('copy-iban-btn').addEventListener('click', copyIBAN);
-    
-    // კალათიდან AI-ზე გადასვლის ღილაკი
-    document.getElementById('send-order-btn').addEventListener('click', startAIOrderProcess);
-
-    // AI ჩატის ელემენტები
-    document.getElementById('open-ai-btn').addEventListener('click', toggleAIChat);
-    document.getElementById('close-ai-btn').addEventListener('click', toggleAIChat);
-    document.getElementById('ai-send-btn').addEventListener('click', handleAISend);
+    document.getElementById('ai-send-btn').addEventListener('click', handleUserResponse);
     document.getElementById('ai-user-input').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') handleAISend();
+        if (e.key === 'Enter') handleUserResponse();
     });
+    document.getElementById('whatsapp-final-btn').addEventListener('click', sendFinalToWhatsApp);
 });
 
-// პროდუქტების რენდერი
 function renderProducts(products) {
     const container = document.getElementById('product-list');
     container.innerHTML = '';
@@ -96,66 +83,20 @@ function addToCart(index) {
     if (existing) {
         existing.qty += 1;
     } else {
-        cart.push({
-            name: product.name,
-            price: Number(product.price),
-            qty: 1
-        });
+        cart.push({ name: product.name, price: Number(product.price), qty: 1 });
     }
-    updateCartUI();
+    updateCartBadge();
 }
 
-function updateCartUI() {
-    const countEl = document.getElementById('cart-count');
-    const itemsEl = document.getElementById('cart-items');
-
+function updateCartBadge() {
     const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
-    countEl.innerText = totalQty;
-
-    itemsEl.innerHTML = '';
-
-    if (cart.length === 0) {
-        itemsEl.innerHTML = '<p>კალათა ცარიელია</p>';
-    } else {
-        cart.forEach((item, i) => {
-            const row = document.createElement('div');
-            row.className = 'cart-item';
-            row.innerHTML = `
-                <div>
-                    <strong>${item.name}</strong><br>
-                    <small>${item.price.toFixed(2)} ₾ x ${item.qty}</small>
-                </div>
-                <div class="qty-controls">
-                    <button type="button" class="qty-btn" onclick="changeQty(${i}, -1)">-</button>
-                    <span>${item.qty}</span>
-                    <button type="button" class="qty-btn" onclick="changeQty(${i}, 1)">+</button>
-                </div>
-            `;
-            itemsEl.appendChild(row);
-        });
-    }
-
-    updateTotal();
+    document.getElementById('cart-count').innerText = totalQty;
 }
 
-function changeQty(index, delta) {
-    if (cart[index]) {
-        cart[index].qty += delta;
-        if (cart[index].qty <= 0) {
-            cart.splice(index, 1);
-        }
-        updateCartUI();
-    }
-}
-
-function updateTotal() {
+function updateCartTotals() {
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-    const zoneSelect = document.getElementById('delivery-zone');
-    let deliveryCost = Number(zoneSelect.value);
-
-    if (subtotal >= 250) {
-        deliveryCost = 0;
-    }
+    let deliveryCost = 3.00;
+    if (subtotal >= 250 || cart.length === 0) deliveryCost = 0;
 
     const finalTotal = subtotal + deliveryCost;
 
@@ -164,14 +105,140 @@ function updateTotal() {
     document.getElementById('final-price').innerText = finalTotal.toFixed(2);
 }
 
-function toggleCart() {
-    const modal = document.getElementById('cart-modal');
-    modal.classList.toggle('show');
+function renderCartItems() {
+    const container = document.getElementById('cart-items-container');
+    container.innerHTML = '';
+
+    if (cart.length === 0) {
+        container.innerHTML = '<p style="text-align:center; padding:20px; color:#888;">კალათა ცარიელია</p>';
+        return;
+    }
+
+    cart.forEach((item, i) => {
+        const row = document.createElement('div');
+        row.className = 'cart-item-row';
+        row.innerHTML = `
+            <div>
+                <strong>${item.name}</strong><br>
+                <small>${item.price.toFixed(2)} ₾ x ${item.qty}</small>
+            </div>
+            <div>
+                <button onclick="changeQty(${i}, -1)">-</button>
+                <span style="margin:0 5px;">${item.qty}</span>
+                <button onclick="changeQty(${i}, 1)">+</button>
+            </div>
+        `;
+        container.appendChild(row);
+    });
 }
 
-function toggleAIChat() {
-    const modal = document.getElementById('ai-chat-modal');
-    modal.classList.toggle('show');
+function changeQty(index, delta) {
+    if (cart[index]) {
+        cart[index].qty += delta;
+        if (cart[index].qty <= 0) cart.splice(index, 1);
+        renderCartItems();
+        updateCartTotals();
+        updateCartBadge();
+    }
+}
+
+function isWorkingHours() {
+    const now = new Date();
+    const hour = now.getHours();
+    return hour >= 10 && hour < 18;
+}
+
+// ================= AI & Checkout Flow =================
+
+function openCheckoutModal() {
+    if (cart.length === 0) {
+        alert("გთხოვთ, ჯერ დაამატოთ პროდუქტი კალათაში!");
+        return;
+    }
+
+    renderCartItems();
+    updateCartTotals();
+
+    const modal = document.getElementById('checkout-modal');
+    modal.classList.add('show');
+
+    // Reset Chat state
+    currentStep = 0;
+    document.getElementById('ai-messages-box').innerHTML = '';
+    document.getElementById('whatsapp-final-btn').classList.add('hidden');
+    document.getElementById('ai-input-wrapper').classList.remove('hidden');
+
+    if (!isWorkingHours()) {
+        appendAIMessage("⛔ გამარჯობა! ამჟამად არასამუშაო საათებია (10:00 - 18:00).\n\nონლაინ შეკვეთების მიღება შეჩერებულია. გთხოვთ გვეწვიოთ მაღაზიაში: **ახალციხე, იაძის ქუჩა #2**!", 'bot');
+        document.getElementById('ai-input-wrapper').classList.add('hidden');
+        return;
+    }
+
+    // AI Welcome Question
+    appendAIMessage("გამარჯობა! მე ვარ Mini Market-ის AI კონსულტანტი. 🛒\n\nსიამოვნებით დაგეხმარებით შეკვეთის გაფორმებაში. სანამ პროდუქციას მოვამზადებთ, გთხოვთ მიუთითოთ თქვენი **სახელი და გვარი**:", 'bot');
+}
+
+function closeCheckoutModal() {
+    document.getElementById('checkout-modal').classList.remove('show');
+}
+
+const aiQuestions = [
+    { key: "fullName", text: "გმადლობთ! ახლა გთხოვთ მიუთითოთ თქვენი **პირადი ნომერი** (უსაფრთხოებისა და იდენტიფიკაციისთვის):" },
+    { key: "personalId", text: "შესანიშნავია. რა არის თქვენი **მობილურის ნომერი**, რომ კურიერმა დაკავშირება შეძლოს?" },
+    { key: "phone", text: "მადლობა! გთხოვთ ჩამიწეროთ **ზუსტი მისამართი** (ქუჩა, შენობის/სახლის ნომერი):" },
+    { key: "cityAddress", text: "ხომ ვერ დააზუსტებთ **სართულს, ბინის ნომერს ან სადარბაზოს კოდს**?" },
+    { key: "floorCode", text: "შეკვეთაში გვაქვს მალფუჭებადი/ახალი პროდუქტები. ხორცპროდუქტებსა და რძის ნაწარმზე ხომ არ გაქვთ ვარგისიანობის ვადის განსაკუთრებული მოთხოვნა?" },
+    { key: "freshnessReq", text: "პურ-ფუნთუშეულისა და საკონდიტრო ნაწარმის შემთხვევაში, რა სახეობის/ფაქტურის პროდუქტი გირჩევნიათ?" },
+    { key: "breadType", text: "ხომ არ აქვს ვინმეს **ალერგია** რომელიმე ინგრედიენტზე (მაგ. ლაქტოზა, გლუტენი, თხილეული)?" },
+    { key: "allergyNotes", text: "თუ რომელიმე კონკრეტული ბრენდის პროდუქტი საწყობში არ აღმოჩნდება, გსურთ თუ არა სხვა ექვივალენტური ბრენდით ჩანაცვლება?" },
+    { key: "replacementPolicy", text: "როდის გსურთ კურიერის მოსვლა? (გთხოვთ მიუთითოთ **სასურველი დროის ინტერვალი**):" },
+    { key: "deliveryTime", text: "გადახდას როგორ გეგმავთ: **ნაღდი ანგარიშსწორებით** კურიერთან თუ **საბანკო გადარიცხვით**?" },
+    { key: "paymentMethod", text: "თუ ნაღდი ანგარიშსწორებაა, დასჭირდება თუ არა კურიერს **ხურდის მოტანა** (რა თანხიდან)?" }
+];
+
+function handleUserResponse() {
+    const inputEl = document.getElementById('ai-user-input');
+    const userText = inputEl.value.trim();
+    if (!userText) return;
+
+    appendAIMessage(userText, 'user');
+    inputEl.value = '';
+
+    // Save step response
+    if (currentStep === 0) {
+        collectedData.fullName = userText;
+    } else if (currentStep <= aiQuestions.length) {
+        const prevQuestion = aiQuestions[currentStep - 1];
+        collectedData[prevQuestion.key] = userText;
+    }
+
+    currentStep++;
+
+    setTimeout(() => {
+        if (currentStep <= aiQuestions.length) {
+            // Friendly persuasive smart prompt every 4 steps
+            if (currentStep === 4) {
+                appendAIMessage("💡 *პატარა რჩევა:* ონლაინ შეკვეთის დეტალური დაზუსტება დროს მოითხოვს. თუ გეჩქარებათ, შეგიძლიათ პირდაპირ მობრძანდეთ ჩვენს მარკეტში **იაძის ქუჩა #2-ში**, სადაც ყველაფერს ადგილზე აარჩევთ!\n\nთუმცა, თუ ონლაინ გსურთ, გავაგრძელოთ 👇", 'bot');
+            }
+            
+            const nextQ = aiQuestions[currentStep - 1];
+            appendAIMessage(nextQ.text, 'bot');
+        } else {
+            // Final Step - All Questions Complete
+            appendAIMessage("🎉 **ყველა საჭირო ინფორმაცია მიღებულია!**\n\nთქვენი მონაცემები გადამოწმებულია. ქვემოთ გამოჩნდა ღილაკი, დააჭირეთ და შეკვეთა ავტომატურად გაიგზავნება ჩვენს WhatsApp-ზე!", 'bot');
+            document.getElementById('ai-input-wrapper').classList.add('hidden');
+            document.getElementById('whatsapp-final-btn').classList.remove('hidden');
+        }
+    }, 600);
+}
+
+function appendAIMessage(text, sender) {
+    const box = document.getElementById('ai-messages-box');
+    const div = document.createElement('div');
+    div.className = `chat-bubble ${sender}`;
+    div.innerText = text;
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
 }
 
 function copyIBAN() {
@@ -181,223 +248,38 @@ function copyIBAN() {
     });
 }
 
-// შემოწმება: არის თუ არა სამუშაო საათები (10:00 - 18:00)
-function isWorkingHours() {
-    const now = new Date();
-    const currentHour = now.getHours();
-    return currentHour >= 10 && currentHour < 18;
-}
-
-// ================= AI ასისტენტის ინტერაქციული ლოგიკა =================
-
-function startAIOrderProcess() {
-    if (cart.length === 0) {
-        alert("გთხოვთ, ჯერ დაამატოთ პროდუქტი კალათაში!");
-        return;
-    }
-
+function sendFinalToWhatsApp() {
+    const itemsText = cart.map(i => `• ${i.name} - ${i.qty}ც (${(i.price * i.qty).toFixed(2)}₾)`).join('\n');
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-    let deliveryCost = Number(document.getElementById('delivery-zone').value);
-    if (subtotal >= 250) deliveryCost = 0;
+    let deliveryCost = subtotal >= 250 ? 0 : 3.00;
     const finalTotal = subtotal + deliveryCost;
 
-    aiOrderData = {
-        cartItems: [...cart],
-        subtotal: subtotal,
-        deliveryCost: deliveryCost,
-        finalTotal: finalTotal,
-        fullName: "",
-        phone: "",
-        address: "",
-        idNumber: "",
-        payMethod: "",
-        changeNeeded: "",
-        preferredTime: "",
-        replacementOk: "",
-        courierNote: "",
-        receiptType: "",
-        confirmed: false
-    };
+    const fullMessage = 
+`🛒 *ახალი შეკვეთა MINI MARKET-ში*
+----------------------------------
+👤 *მყიდველი:* ${collectedData.fullName}
+🆔 *პირადი №:* ${collectedData.personalId}
+📞 *ტელეფონი:* ${collectedData.phone}
+📍 *მისამართი:* ${collectedData.cityAddress}
+🏢 *სართული/კოდი:* ${collectedData.floorCode}
 
-    currentQuestionStep = 0;
+📦 *პროდუქცია:*
+${itemsText}
 
-    // კალათის დახურვა და AI ჩატის გახსნა
-    toggleCart();
-    const modal = document.getElementById('ai-chat-modal');
-    modal.classList.add('show');
+💰 *პროდუქცია:* ${subtotal.toFixed(2)} ₾
+🚚 *მიწოდება:* ${deliveryCost.toFixed(2)} ₾
+✅ *სულ ჯამი:* ${finalTotal.toFixed(2)} ₾
 
-    const messagesContainer = document.getElementById('ai-messages');
-    messagesContainer.innerHTML = '';
+📋 *დამატებითი დეტალები:*
+• ვარგისიანობის მოთხოვნა: ${collectedData.freshnessReq}
+• პურის ტიპი: ${collectedData.breadType}
+• ალერგიები: ${collectedData.allergyNotes}
+• ჩანაცვლების პოლიტიკა: ${collectedData.replacementPolicy}
+• სასურველი დრო: ${collectedData.deliveryTime}
+• გადახდის მეთოდი: ${collectedData.paymentMethod}
+• ხურდის საჭიროება: ${collectedData.changeRequirement}`;
 
-    // სამუშაო საათების შემოწმება
-    if (!isWorkingHours()) {
-        appendAIMessage(`გამარჯობა! 👋 მადლობა, რომ დაინტერესდით ჩვენი პროდუქციით.\n\nსამწუხაროდ, ამჟამად არასამუშაო საათებია. ჩვენი მაღაზია და ონლაინ მიწოდების სერვისი მუშაობს **10:00-დან 18:00 საათამდე**.\n\nახლა შეკვეთას ვერ გავაფორმებთ, თუმცა ძალიან გავეხარდებით, თუ გვეწვევით დილით 10:00 საათიდან ან მობრძანდებით ჩვენს მაღაზიაში ადგილზე:\n📍 **მისამართი: იაძის ქუჩა #2, ახალციხე**.`, 'bot');
-        return;
-    }
-
-    // AI იწყებს საუბარს
-    appendAIMessage(`გამარჯობა! 🌿 მე ვარ Mini Market-ის ონლაინ ასისტენტი. ძალიან მიხარია, რომ ჩვენი პროდუქცია აირჩიეთ!\n\nთქვენს კალათაშია ${cart.length} დასახელების პროდუქტი, ჯამური ღირებულებით **${finalTotal.toFixed(2)} ₾**.\n\nშეკვეთა რომ ზუსტად და შეუფერხებლად მოგიტანოთ, რამდენიმე დეტალს დავაზუსტებ. პირველ რიგში, გთხოვთ მიუთითოთ თქვენი **სახელი და გვარი**?`, 'bot');
-    currentQuestionStep = 1;
-}
-
-function handleAISend() {
-    const inputEl = document.getElementById('ai-user-input');
-    const msg = inputEl.value.trim();
-    if (!msg) return;
-
-    appendAIMessage(msg, 'user');
-    inputEl.value = '';
-
-    setTimeout(() => {
-        processAIResponse(msg);
-    }, 600);
-}
-
-function appendAIMessage(text, sender) {
-    const container = document.getElementById('ai-messages');
-    const div = document.createElement('div');
-    div.className = `ai-msg ${sender}`;
-    div.innerText = text;
-    container.appendChild(div);
-    container.scrollTop = container.scrollHeight;
-}
-
-function processAIResponse(userInput) {
-    if (!isWorkingHours()) {
-        appendAIMessage("გთხოვთ გაითვალისწინოთ, რომ ამჟამად არასამუშაო საათებია (10:00-18:00). გოდებთ დილით იაძის #2-ში!", 'bot');
-        return;
-    }
-
-    // 10-12 ეტაპიანი კითხვარი
-    switch (currentQuestionStep) {
-        case 1:
-            aiOrderData.fullName = userInput;
-            appendAIMessage(`სასიამოვნოა თქვენი გაცნობა, ${aiOrderData.fullName}! 😊\n\nახლა გთხოვთ მომწეროთ თქვენი **მობილურის ნომერი**, რომ კურიერმა დაკავშირება შეძლოს.`, 'bot');
-            currentQuestionStep = 2;
-            break;
-
-        case 2:
-            aiOrderData.phone = userInput;
-            appendAIMessage(`ძალიან კარგი! 📞 ახლა მიუთითეთ **ზუსტი მისამართი** (ქუჩა, სახლი/კორპუსი, სადარბაზო, სართული, ბინა).`, 'bot');
-            currentQuestionStep = 3;
-            break;
-
-        case 3:
-            aiOrderData.address = userInput;
-            appendAIMessage(`მადლობა! საბუღალტრო აღრიცხვისა და ქვითრისთვის, თუ საიდუმლო არ არის, გთხოვთ მიუთითოთ თქვენი **პირადი ნომერი**?`, 'bot');
-            currentQuestionStep = 4;
-            break;
-
-        case 4:
-            aiOrderData.idNumber = userInput;
-            appendAIMessage(`გასაგებია. გადახდას როგორ ისურვებთ? 💳\n\n1) ნაღდი ანგარიშსწორება კურიერთან\n2) საბანკო გადარიცხვა (ბარათით)`, 'bot');
-            currentQuestionStep = 5;
-            break;
-
-        case 5:
-            aiOrderData.payMethod = userInput;
-            appendAIMessage(`შესანიშნავია. ნაღდი ანგარიშსწორებისას ან ბარათის შემთხვევაში, **დაგჭირდებათ თუ არა ხურდა** და რამდენიანი კუპიურიდან?`, 'bot');
-            currentQuestionStep = 6;
-            break;
-
-        case 6:
-            aiOrderData.changeNeeded = userInput;
-            appendAIMessage(`დიდი მადლობა. **რომელ საათებში გირჩევნიათ მიწოდება?** (მაგალითად: უახლოეს 1 საათში, 14:00-დან 16:00-მდე და ა.შ.)`, 'bot');
-            currentQuestionStep = 7;
-            break;
-
-        case 7:
-            aiOrderData.preferredTime = userInput;
-            appendAIMessage(`თუ რომელიმე არჩეული პროდუქტი საწყობში დროებით არ აღმოჩნდა, **გსურთ თუ არა მსგავსი ალტერნატივით ჩანაცვლება**, თუ უბრალოდ ამოვიღოთ შეკვეთიდან?`, 'bot');
-            currentQuestionStep = 8;
-            break;
-
-        case 8:
-            aiOrderData.replacementOk = userInput;
-            appendAIMessage(`გავითვალისწინე. ხომ არ გაქვთ რაიმე **დამატებითი მითითება კურიერისთვის**? (მაგ. ეზოში ძაღლია, ეზოს კარზე დარეკეთ, ლიფტი არ მუშაობს და ა.შ.)`, 'bot');
-            currentQuestionStep = 9;
-            break;
-
-        case 9:
-            aiOrderData.courierNote = userInput;
-            appendAIMessage(`თითქმის მზად ვართ! 🧾 ქვითარი გსურთ **ელექტრონულად (SMS/WhatsApp-ით)** თუ **ამონაბეჭდი** პროდუქტთან ერთად?`, 'bot');
-            currentQuestionStep = 10;
-            break;
-
-        case 10:
-            aiOrderData.receiptType = userInput;
-            
-            // შეჯამება
-            let summary = `✨ **შეკვეთის შეჯამება:**\n\n`;
-            summary += `👤 **მყიდველი:** ${aiOrderData.fullName}\n`;
-            summary += `📞 **ტელეფონი:** ${aiOrderData.phone}\n`;
-            summary += `📍 **მისამართი:** ${aiOrderData.address}\n`;
-            summary += `🆔 **პირადი ნომერი:** ${aiOrderData.idNumber}\n`;
-            summary += `💳 **გადახდა:** ${aiOrderData.payMethod}\n`;
-            summary += `💵 **ხურდა:** ${aiOrderData.changeNeeded}\n`;
-            summary += `⏰ **დრო:** ${aiOrderData.preferredTime}\n`;
-            summary += `🔄 **ჩანაცვლება:** ${aiOrderData.replacementOk}\n`;
-            summary += `📝 **შენიშვნა:** ${aiOrderData.courierNote}\n`;
-            summary += `🧾 **ქვითარი:** ${aiOrderData.receiptType}\n\n`;
-            summary += `💰 **სულ გადასახდელი:** ${aiOrderData.finalTotal.toFixed(2)} ₾\n\n`;
-            summary += `ყველაფერი სწორად არის მითითებული? გთხოვთ დამიდასტუროთ (დიახ / არა).`;
-
-            appendAIMessage(summary, 'bot');
-            currentQuestionStep = 11;
-            break;
-
-        case 11:
-            if (userInput.toLowerCase().includes('დიახ') || userInput.toLowerCase().includes('კი') || userInput.toLowerCase().includes('სწორია')) {
-                aiOrderData.confirmed = true;
-                
-                appendAIMessage(`🎉 შესანიშნავია! ყველა მონაცემი შეგროვებულია.\n\nახლა შეგიძლიათ დააჭიროთ ქვემოთ მოცემულ ღილაკს და შეკვეთა პირდაპირ გადაიგზავნება ოპერატორის WhatsApp-ზე! 🚀`, 'bot');
-                
-                showWhatsAppButton();
-            } else {
-                appendAIMessage(`თუ რომელიმე მონაცემი არასწორია, გთხოვთ მომწეროთ რა შევცვალო, ან თავიდან დავიწყოთ.`, 'bot');
-            }
-            break;
-
-        default:
-            appendAIMessage(`შეკვეთა უკვე მომზადებულია. შეგიძლიათ გააგზავნოთ WhatsApp-ის ღილაკით!`, 'bot');
-            break;
-    }
-}
-
-// WhatsApp-ის ღილაკის გამოჩენა AI ჩატში
-function showWhatsAppButton() {
-    const container = document.getElementById('ai-messages');
-    
-    // პროდუქტების სიის ტექსტი
-    let itemsText = aiOrderData.cartItems.map(item => `• ${item.name} (${item.qty}x) - ${(item.price * item.qty).toFixed(2)}₾`).join('\n');
-
-    let waText = `🛍️ *ახალი შეკვეთა MINI MARKET-დან*\n\n`;
-    waText += `👤 *სახელი:* ${aiOrderData.fullName}\n`;
-    waText += `📞 *ტელეფონი:* ${aiOrderData.phone}\n`;
-    waText += `📍 *მისამართი:* ${aiOrderData.address}\n`;
-    waText += `🆔 *პირადი №:* ${aiOrderData.idNumber}\n`;
-    waText += `💳 *გადახდა:* ${aiOrderData.payMethod}\n`;
-    waText += `💵 *ხურდა:* ${aiOrderData.changeNeeded}\n`;
-    waText += `⏰ *სასურველი დრო:* ${aiOrderData.preferredTime}\n`;
-    waText += `🔄 *ჩანაცვლება:* ${aiOrderData.replacementOk}\n`;
-    waText += `📝 *კურიერის შენიშვნა:* ${aiOrderData.courierNote}\n`;
-    waText += `🧾 *ქვითარი:* ${aiOrderData.receiptType}\n\n`;
-    waText += `🛒 *პროდუქტები:*\n${itemsText}\n\n`;
-    waText += `💵 *პროდუქტები:* ${aiOrderData.subtotal.toFixed(2)} ₾\n`;
-    waText += `🚚 *მიწოდება:* ${aiOrderData.deliveryCost.toFixed(2)} ₾\n`;
-    waText += `💰 *სულ ჯამი:* ${aiOrderData.finalTotal.toFixed(2)} ₾`;
-
-    const encodedText = encodeURIComponent(waText);
-    const whatsappUrl = `https://wa.me/995555123456?text=${encodedText}`; // შეცვალეთ თქვენი ნომრით
-
-    const btnDiv = document.createElement('div');
-    btnDiv.style.textAlign = 'center';
-    btnDiv.style.marginTop = '15px';
-    btnDiv.innerHTML = `
-        <a href="${whatsappUrl}" target="_blank" style="display: inline-block; background-color: #25D366; color: white; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px;">
-            <i class="fa-brands fa-whatsapp"></i> შეკვეთის გაგზავნა WhatsApp-ზე
-        </a>
-    `;
-    container.appendChild(btnDiv);
-    container.scrollTop = container.scrollHeight;
+    const encodedMsg = encodeURIComponent(fullMessage);
+    // WhatsApp Direct Link
+    window.open(`https://wa.me/?text=${encodedMsg}`, '_blank');
 }
