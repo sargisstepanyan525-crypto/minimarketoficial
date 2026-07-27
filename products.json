@@ -228,5 +228,10 @@
   "name": "ყავა მეამა",
   "price": 4.60,
   "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTd0V09d8EIKSY8Bu_Y4Ni-gwYc4pNYZ3yLU50zMRMESFdEo7edeGkUvbc&s=10"
+},
+  {
+  "name": "სწრაფი მომზადების ვერმიშელი საქონლის",
+  "price": 0.99,
+  "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPMZJE7_1IY3JjQTnQnBf9rCy0N1UE580OheOfoC-Bz8pNUcj-HEPv1LQ&s=10"
 }
 ]
