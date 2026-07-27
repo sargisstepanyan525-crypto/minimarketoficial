@@ -242,6 +242,117 @@ body {
     font-weight: bold;
 }
 
+/* AI Floating Button */
+.ai-float-btn {
+    position: fixed;
+    bottom: 95px;
+    right: 25px;
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+    z-index: 99;
+}
+
+/* AI Modal & Chat */
+.ai-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.ai-modal.show {
+    display: flex;
+}
+
+.ai-chat-container {
+    background: #ffffff;
+    width: 92%;
+    max-width: 420px;
+    height: 500px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+}
+
+.ai-chat-header {
+    background: #1e40af;
+    color: white;
+    padding: 12px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ai-messages {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #f8fafc;
+}
+
+.ai-msg {
+    max-width: 80%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.ai-msg.bot {
+    background: #e2e8f0;
+    color: #1e293b;
+    align-self: flex-start;
+}
+
+.ai-msg.user {
+    background: #2563eb;
+    color: white;
+    align-self: flex-end;
+}
+
+.ai-input-area {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #e2e8f0;
+    background: #fff;
+}
+
+.ai-input-area input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    outline: none;
+}
+
+.ai-input-area button {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 0 15px;
+    margin-left: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
 /* Modal / Cart Window */
 .cart-modal {
     display: none;
