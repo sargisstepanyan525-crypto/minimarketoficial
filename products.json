@@ -333,10 +333,15 @@
   "name": "საფუარი მშრალი პაკმაია 100 გრ.",
   "price": 1.49,
   "imageUrl": "https://nikorasupermarket.ge/modules/current_promotions/uploads/15314.png"
-},{
+},
+  {
   "name": "საფუარი მშრალი 100 გრ. ",
   "price": 1.49,
   "imageUrl": "https://karabadini.ge/wp-content/uploads/2025/01/safuari-farimani.jpg"
 }
-  
+  {
+  "name": "ტილოები გერმანული",
+  "price": 0.99,
+  "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcR-dtwYuvx2JYXD66O4sGaHYurDbD0rcNsOFaDjTe12sZNcYBub8UAqJ-B5Z802UTKsVmAZGcaoZTslVsUT9qY6iQ6E35Sh-faknqZ2-pjNX_uX41O3WZAWbXeaX9ai_ccAoelOxg&usqp=CAc"
+}
 ]
