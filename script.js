@@ -287,7 +287,7 @@ function handleUserResponse() {
     setTimeout(() => {
         if (currentStep <= aiQuestions.length) {
             if (currentStep === 5) {
-                appendAIMessage("💡 *შეხსენება:* თუ გეჩქარებათ, შეგიძლიათ პირდაპირ მობრძანდეთ ჩვენს მარკეტში **იაძის ქუჩა #2ი-ში**!\n\nთუმცა, თუ ონლაინ გირჩევნიათ, გავაგრძელოთ 👇", 'bot');
+                appendAIMessage("💡 *შეხსენება:* თუ გეჩქარებათ, შეგიძლიათ პირდაპირ მობრძანდეთ ჩვენს მინი მარკეტში **იაძის ქუჩა #2ი-ში**!\n\nთუმცა, თუ ონლაინ გირჩევნიათ, გავაგრძელოთ 👇", 'bot');
             }
             const nextQ = aiQuestions[currentStep - 1];
             appendAIMessage(nextQ.text, 'bot');
