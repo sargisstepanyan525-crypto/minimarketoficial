@@ -54,17 +54,23 @@ function renderProducts(products) {
         return;
     }
 
-    products.forEach((item) => {
+    products.forEach((item, i) => {
         const card = document.createElement('div');
         card.className = 'product-card';
+        const safeName = item.name.replace(/'/g, "\\'");
         card.innerHTML = `
             <div class="product-img-wrapper">
                 <img src="${item.imageUrl}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/180?text=Mini+Market'">
             </div>
             <div class="product-title">${item.name}</div>
+            <div class="qty-stepper">
+                <button type="button" class="qty-btn" onclick="adjustQty(${i}, -1)">−</button>
+                <span class="qty-value" id="qty-${i}">1</span>
+                <button type="button" class="qty-btn" onclick="adjustQty(${i}, 1)">+</button>
+            </div>
             <div class="product-footer">
                 <div class="product-price">${Number(item.price).toFixed(2)} ₾</div>
-                <button type="button" class="add-to-cart-btn" onclick="addToCart('${item.name.replace(/'/g, "\\'")}', ${item.price})">
+                <button type="button" class="add-to-cart-btn" onclick="addToCartWithQty(${i}, '${safeName}', ${item.price})">
                     <i class="fa-solid fa-cart-plus"></i> დამატება
                 </button>
             </div>
@@ -73,12 +79,28 @@ function renderProducts(products) {
     });
 }
 
-function addToCart(name, price) {
+function adjustQty(i, delta) {
+    const span = document.getElementById('qty-' + i);
+    if (!span) return;
+    let val = parseInt(span.innerText, 10) + delta;
+    if (val < 1) val = 1;
+    if (val > 99) val = 99;
+    span.innerText = val;
+}
+
+function addToCartWithQty(i, name, price) {
+    const span = document.getElementById('qty-' + i);
+    const qtyToAdd = span ? parseInt(span.innerText, 10) : 1;
+    addToCart(name, price, qtyToAdd);
+    if (span) span.innerText = 1;
+}
+
+function addToCart(name, price, qty = 1) {
     const existing = cart.find(item => item.name === name);
     if (existing) {
-        existing.qty += 1;
+        existing.qty += qty;
     } else {
-        cart.push({ name: name, price: Number(price), qty: 1 });
+        cart.push({ name: name, price: Number(price), qty: qty });
     }
     updateCartUI();
 }
