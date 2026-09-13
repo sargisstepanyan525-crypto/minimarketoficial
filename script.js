@@ -43,6 +43,23 @@ document.addEventListener("DOMContentLoaded", () => {
         if (e.key === 'Enter') handleUserResponse();
     });
     document.getElementById('submit-order-btn').addEventListener('click', sendFinalOrder);
+
+    // 4. Keep the chat input visible above the mobile on-screen keyboard
+    const chatInputEl = document.getElementById('ai-user-input');
+    chatInputEl.addEventListener('focus', () => {
+        setTimeout(() => {
+            chatInputEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 300);
+    });
+
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', () => {
+            const modal = document.getElementById('checkout-modal');
+            if (modal.classList.contains('show') && document.activeElement === chatInputEl) {
+                chatInputEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+    }
 });
 
 function renderProducts(products) {
