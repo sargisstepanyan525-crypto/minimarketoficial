@@ -4,6 +4,9 @@ let cart = [];
 let currentStep = 0;
 let deliveryCost = 3.00;
 
+// Web3Forms delivers this order straight to the shop's inbox in the background.
+const WEB3FORMS_ACCESS_KEY = "b4fcd015-d5a8-4a2a-8e1a-39088c68357e";
+
 let collectedData = {
     fullName: "", personalId: "", phone: "", locationType: "", cityAddress: "", floorCode: "",
     freshnessReq: "", breadType: "", allergyNotes: "", replacementPolicy: "", deliveryTime: "", paymentMethod: "", changeRequirement: ""
@@ -39,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('ai-user-input').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') handleUserResponse();
     });
-    document.getElementById('whatsapp-final-btn').addEventListener('click', sendFinalToWhatsApp);
+    document.getElementById('submit-order-btn').addEventListener('click', sendFinalOrder);
 });
 
 function renderProducts(products) {
@@ -91,7 +94,7 @@ function updateCartUI() {
 function updateCartTotals() {
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
     let currentDelivery = deliveryCost;
-    
+
     if (subtotal >= 250 || cart.length === 0) {
         currentDelivery = 0;
     }
@@ -162,7 +165,12 @@ function openCheckoutModal() {
 
     currentStep = 0;
     document.getElementById('ai-messages-box').innerHTML = '';
-    document.getElementById('whatsapp-final-btn').classList.add('hidden');
+
+    const submitBtn = document.getElementById('submit-order-btn');
+    submitBtn.classList.add('hidden');
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '<i class="fa-solid fa-check"></i> შეკვეთის დადასტურება';
+
     document.getElementById('ai-input-wrapper').classList.remove('hidden');
 
     if (!isWorkingHours()) {
@@ -179,8 +187,8 @@ function closeCheckoutModal() {
 }
 
 const aiQuestions = [
-    { 
-        key: "fullName", 
+    {
+        key: "fullName",
         text: "გმადლობთ! ახლა გთხოვთ მიუთითოთ თქვენი **პირადი ნომერი** (ზუსტად 11 ციფრი):",
         validate: (input) => {
             const clean = input.replace(/\D/g, '');
@@ -191,8 +199,8 @@ const aiQuestions = [
         },
         format: (input) => input.replace(/\D/g, '')
     },
-    { 
-        key: "personalId", 
+    {
+        key: "personalId",
         text: "შესანიშნავია. რა არის თქვენი **მობილურის ნომერი**? (მაგ: 599123456 - 9 ციფრი):",
         validate: (input) => {
             const clean = input.replace(/\D/g, '');
@@ -207,8 +215,8 @@ const aiQuestions = [
             return clean.startsWith('995') ? clean.slice(3) : clean;
         }
     },
-    { 
-        key: "phone", 
+    {
+        key: "phone",
         text: "გთხოვთ აირჩიოთ მიწოდების ზონა:\n1️⃣ **ქალაქში (3₾)**\n2️⃣ **სოფელში/გარეუბანში (8₾)**\n\n(ჩაწერთ: ქალაქი ან სოფელი):",
         validate: (input) => {
             const val = input.toLowerCase();
@@ -229,8 +237,8 @@ const aiQuestions = [
             updateCartTotals();
         }
     },
-    { 
-        key: "cityAddress", 
+    {
+        key: "cityAddress",
         text: "გთხოვთ ჩამიწეროთ **ზუსტი მისამართი** (ქუჩა, შენობის/სახლის ნომერი, სოფლის დასახელება):",
         validate: (input) => {
             if (input.trim().length < 4) {
@@ -292,9 +300,9 @@ function handleUserResponse() {
             const nextQ = aiQuestions[currentStep - 1];
             appendAIMessage(nextQ.text, 'bot');
         } else {
-            appendAIMessage("🎉 **ყველა მონაცემი ზუსტად შემოწმდა და მიღებულია!**\n\nქვემოთ გამოჩნდა ღილაკი. დააჭირეთ და შეკვეთა სრულად გაიგზავნება WhatsApp-ზე!", 'bot');
+            appendAIMessage("🎉 **ყველა მონაცემი ზუსტად შემოწმდა და მიღებულია!**\n\nქვემოთ გამოჩნდა ღილაკი — დააჭირეთ და შეკვეთა დასრულდება!", 'bot');
             document.getElementById('ai-input-wrapper').classList.add('hidden');
-            document.getElementById('whatsapp-final-btn').classList.remove('hidden');
+            document.getElementById('submit-order-btn').classList.remove('hidden');
         }
     }, 500);
 }
@@ -315,38 +323,80 @@ function copyIBAN() {
     });
 }
 
-function sendFinalToWhatsApp() {
+function buildOrderMessage() {
     const itemsText = cart.map(i => `• ${i.name} - ${i.qty}ც (${(i.price * i.qty).toFixed(2)}₾)`).join('\n');
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
     let finalDelivery = subtotal >= 250 ? 0 : deliveryCost;
     const finalTotal = subtotal + finalDelivery;
 
-    const fullMessage = 
-`🛒 *ახალი შეკვეთა MINI MARKET-ში*
+    return (
+`🛒 ახალი შეკვეთა MINI MARKET-ში
 ----------------------------------
-👤 *მყიდველი:* ${collectedData.fullName}
-🆔 *პირადი №:* ${collectedData.personalId}
-📞 *ტელეფონი:* +995${collectedData.phone}
-🌐 *ზონა:* ${collectedData.locationType}
-📍 *მისამართი:* ${collectedData.cityAddress}
-🏢 *სართული/კოდი:* ${collectedData.floorCode}
+👤 მყიდველი: ${collectedData.fullName}
+🆔 პირადი №: ${collectedData.personalId}
+📞 ტელეფონი: +995${collectedData.phone}
+🌐 ზონა: ${collectedData.locationType}
+📍 მისამართი: ${collectedData.cityAddress}
+🏢 სართული/კოდი: ${collectedData.floorCode}
 
-📦 *პროდუქცია:*
+📦 პროდუქცია:
 ${itemsText}
 
-💰 *პროდუქცია:* ${subtotal.toFixed(2)} ₾
-🚚 *მიწოდება:* ${finalDelivery.toFixed(2)} ₾
-✅ *სულ ჯამი:* ${finalTotal.toFixed(2)} ₾
+💰 პროდუქცია: ${subtotal.toFixed(2)} ₾
+🚚 მიწოდება: ${finalDelivery.toFixed(2)} ₾
+✅ სულ ჯამი: ${finalTotal.toFixed(2)} ₾
 
-📋 *დამატებითი დეტალები:*
+📋 დამატებითი დეტალები:
 • ვარგისიანობის მოთხოვნა: ${collectedData.freshnessReq}
 • პურის ტიპი: ${collectedData.breadType}
 • ალერგიები: ${collectedData.allergyNotes}
 • ჩანაცვლება: ${collectedData.replacementPolicy}
 • სასურველი დრო: ${collectedData.deliveryTime}
 • გადახდის მეთოდი: ${collectedData.paymentMethod}
-• ხურდის საჭიროება: ${collectedData.changeRequirement}`;
-
-    const encodedMsg = encodeURIComponent(fullMessage);
-    window.open(`https://wa.me/?text=${encodedMsg}`, '_blank');
+• ხურდის საჭიროება: ${collectedData.changeRequirement}`
+    );
 }
+
+// Sends the finished order to the shop's inbox in the background via Web3Forms.
+// The customer never sees where it goes — they only see the confirmation message below.
+async function submitOrderToEmail(message) {
+    try {
+        const response = await fetch("https://api.web3forms.com/submit", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({
+                access_key: WEB3FORMS_ACCESS_KEY,
+                subject: "ახალი შეკვეთა — Mini Market",
+                from_name: collectedData.fullName || "Mini Market საიტი",
+                message: message
+            })
+        });
+        const result = await response.json();
+        return !!result.success;
+    } catch (err) {
+        console.error("Order submit error:", err);
+        return false;
+    }
+}
+
+async function sendFinalOrder() {
+    const btn = document.getElementById('submit-order-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> იგზავნება...';
+
+    const message = buildOrderMessage();
+    const success = await submitOrderToEmail(message);
+
+    if (success) {
+        appendAIMessage("✅ თქვენი შეკვეთა წარმატებით მიღებულია! ჩვენი წარმომადგენელი მალე დაგიკავშირდებათ დეტალების დასაზუსტებლად.\n\nმადლობა რომ გვირჩევთ! 🙏", 'bot');
+        btn.classList.add('hidden');
+    } else {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> სცადეთ თავიდან';
+        appendAIMessage("⚠️ შეკვეთის გაგზავნისას მოხდა შეცდომა. გთხოვთ სცადოთ ხელახლა ან დაგვირეკოთ ტელეფონით.", 'bot error');
+    }
+}
+
