@@ -805,6 +805,65 @@ body {
 }
 .chat-input-area input:focus { border-color: var(--forest); }
 
+.chat-choice-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-self: flex-start;
+    max-width: 90%;
+}
+
+.chat-choice-btn {
+    background: var(--surface);
+    border: 1.5px solid var(--forest);
+    color: var(--forest-dark);
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.chat-choice-btn:hover { background: var(--forest); color: #fff; }
+
+.chat-select-row {
+    display: flex;
+    gap: 8px;
+    align-self: flex-start;
+    width: 100%;
+    max-width: 92%;
+}
+
+.chat-select {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 14px;
+    border: 1.5px solid var(--surface-border);
+    border-radius: 20px;
+    background: var(--surface);
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--ink);
+    outline: none;
+}
+
+.chat-select:focus { border-color: var(--forest); }
+
+.chat-select-confirm {
+    background: var(--forest);
+    color: #fff;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.chat-select-confirm:hover { background: var(--forest-dark); }
+
 .send-btn {
     background: var(--forest); color: white; border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer;
 }
