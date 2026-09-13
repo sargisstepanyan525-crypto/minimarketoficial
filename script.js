@@ -5,7 +5,7 @@ let currentStep = 0;
 let deliveryCost = 3.00;
 
 // Web3Forms delivers this order straight to the shop's inbox in the background.
-const WEB3FORMS_ACCESS_KEY = "b4fcd015-d5a8-4a2a-8e1a-39088c68357e";
+const WEB3FORMS_ACCESS_KEY = "5c6ec571-bc5b-4d67-b235-26c5655fb970";
 
 let collectedData = {
     fullName: "", personalId: "", phone: "", locationType: "", cityAddress: "", floorCode: "",
@@ -375,6 +375,7 @@ async function submitOrderToEmail(message) {
             })
         });
         const result = await response.json();
+        console.log("Web3Forms response:", response.status, result);
         return !!result.success;
     } catch (err) {
         console.error("Order submit error:", err);
@@ -399,4 +400,3 @@ async function sendFinalOrder() {
         appendAIMessage("⚠️ შეკვეთის გაგზავნისას მოხდა შეცდომა. გთხოვთ სცადოთ ხელახლა ან დაგვირეკოთ ტელეფონით.", 'bot error');
     }
 }
-
