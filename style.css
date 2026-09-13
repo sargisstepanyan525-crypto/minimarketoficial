@@ -1,12 +1,12 @@
 /*
-  DESIGN TOKENS — "Neighbourhood Market" concept
-  Color   : ink #16241F · paper #F7F4EC · surface #FFFFFF · forest #1F5D4C (primary)
-            forest-dark #143D32 · saffron #E8A33D (accent) · brick #C1443A (error)
+  DESIGN TOKENS - "Neighbourhood Market" concept
+  Color   : ink #16241F, paper #F7F4EC, surface #FFFFFF, forest #1F5D4C (primary)
+            forest-dark #143D32, saffron #E8A33D (accent), brick #C1443A (error)
   Type    : Noto Serif Georgian (display/headings) + Noto Sans Georgian (UI/body)
   Layout  : asymmetric hero (copy + receipt-ticket card), receipt-row feature list,
             price shown as a small angled tag on each product card
-  Principle: everything borrows from a real market counter — tickets, tags,
-             dashed perforations, barcodes — instead of generic SaaS cards.
+  Principle: everything borrows from a real market counter - tickets, tags,
+             dashed perforations, barcodes - instead of generic SaaS cards.
 */
 
 :root {
@@ -471,9 +471,47 @@ body {
 .product-title {
     font-size: 14.5px;
     font-weight: 600;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     min-height: 40px;
     color: var(--ink);
+}
+
+.qty-stepper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    background: var(--paper);
+    border: 1px solid var(--surface-border);
+    border-radius: 20px;
+    padding: 6px 10px;
+    margin-bottom: 12px;
+}
+
+.qty-btn {
+    background: var(--forest-light);
+    color: var(--forest-dark);
+    border: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+
+.qty-btn:hover { background: var(--forest); color: #fff; }
+
+.qty-value {
+    min-width: 20px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 14px;
 }
 
 .product-footer {
@@ -795,9 +833,10 @@ body {
 .hidden { display: none !important; }
 
 @media (max-width: 900px) {
-    .modal-body-split { flex-direction: column; height: auto; }
+    .modal-body-split { flex-direction: column; height: auto; max-height: 85vh; overflow-y: auto; }
     .cart-summary-column { width: 100%; border-right: none; border-bottom: 1px solid var(--surface-border); }
-    .chat-messages-container { max-height: 260px; }
+    .cart-items-list { max-height: 34vh; overflow-y: auto; flex: none; }
+    .chat-messages-container { max-height: 220px; }
     .hero-grid { flex-direction: column; }
     .hero-ticket { transform: none; width: 100%; }
     .hero-copy { max-width: 100%; }
