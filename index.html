@@ -1,4 +1,3 @@
-     ვებ-გვერდი მუშაობს სატესტო რეჟიმში!
 <!DOCTYPE html>
 <html lang="ka">
 <head>
@@ -16,13 +15,19 @@
 <div class="top-announcement-bar">
     <div class="container announcement-content">
         <div class="store-working-hours">
-            <i class="fa-regular fa-clock"></i> სამუშაო საათები: 10:00 - 18:00
+            <i class="fa-regular fa-clock"></i> <span data-i18n="hours_label">სამუშაო საათები: 10:00 - 18:00</span>
         </div>
         <div class="header-phones">
-            <span class="phone-label">დარეკეთ:</span>
+            <span class="phone-label" data-i18n="call_label">დარეკეთ:</span>
             <a href="tel:+995500224822" class="phone-link"><i class="fa-solid fa-phone"></i> 500 22 48 22</a>
             <span class="phone-divider">|</span>
             <a href="old.html" class="phone-link version-switch">ძველი ვერსია</a>
+        </div>
+        <div class="lang-switch" id="lang-switch">
+            <button type="button" class="lang-btn" data-lang="ka">GE</button>
+            <button type="button" class="lang-btn" data-lang="en">EN</button>
+            <button type="button" class="lang-btn" data-lang="ru">RU</button>
+            <button type="button" class="lang-btn" data-lang="hy">AM</button>
         </div>
     </div>
 </div>
@@ -33,13 +38,13 @@
             <div class="logo-icon"><i class="fa-solid fa-basket-shopping"></i></div>
             <div>
                 <div class="brand-name">MINI MARKET</div>
-                <div class="brand-tagline">ახალციხე</div>
+                <div class="brand-tagline" data-i18n="brand_tagline">ახალციხე</div>
             </div>
         </a>
 
         <div class="search-bar-wrapper">
             <i class="fa-solid fa-magnifying-glass search-icon"></i>
-            <input type="text" id="search-input" placeholder="მოძებნეთ პროდუქტი...">
+            <input type="text" id="search-input" placeholder="მოძებნეთ პროდუქტი..." data-i18n-placeholder="search_placeholder">
         </div>
 
         <button id="open-cart-btn" class="cart-btn" type="button">
@@ -55,35 +60,35 @@
 <section class="hero-section">
     <div class="container hero-grid">
         <div class="hero-copy">
-            <div class="hero-badge"><i class="fa-solid fa-robot"></i> შეკვეთა AI კონსულტანტთან ერთად</div>
-            <h1 class="hero-title">ეზოში შემოსული<br>პატარა მარკეტი</h1>
-            <p class="hero-subtitle">აირჩიეთ პროდუქტი, დაელაპარაკეთ ჩვენს AI კონსულტანტს — და კურიერი უკვე გზაშია.</p>
+            <div class="hero-badge"><i class="fa-solid fa-robot"></i> <span data-i18n="hero_badge">შეკვეთა AI კონსულტანტთან ერთად</span></div>
+            <h1 class="hero-title" data-i18n="hero_title" data-i18n-html="true">ეზოში შემოსული<br>პატარა მარკეტი</h1>
+            <p class="hero-subtitle" data-i18n="hero_subtitle">აირჩიეთ პროდუქტი, დაელაპარაკეთ ჩვენს AI კონსულტანტს — და კურიერი უკვე გზაშია.</p>
 
             <div class="hero-features">
                 <div class="feature-item">
-                    <span class="feature-label"><i class="fa-solid fa-truck-fast"></i> სწრაფი მიწოდება</span>
+                    <span class="feature-label"><i class="fa-solid fa-truck-fast"></i> <span data-i18n="feature_delivery_label">სწრაფი მიწოდება</span></span>
                     <span class="feature-leader"></span>
-                    <span class="feature-value">1–2 სთ</span>
+                    <span class="feature-value" data-i18n="feature_delivery_value">1–2 სთ</span>
                 </div>
                 <div class="feature-item">
-                    <span class="feature-label"><i class="fa-solid fa-comments"></i> AI კონსულტანტი</span>
+                    <span class="feature-label"><i class="fa-solid fa-comments"></i> <span data-i18n="feature_ai_label">AI კონსულტანტი</span></span>
                     <span class="feature-leader"></span>
-                    <span class="feature-value">24/7</span>
+                    <span class="feature-value" data-i18n="feature_ai_value">24/7</span>
                 </div>
                 <div class="feature-item">
-                    <span class="feature-label"><i class="fa-solid fa-shield-halved"></i> დაცული შეკვეთა</span>
+                    <span class="feature-label"><i class="fa-solid fa-shield-halved"></i> <span data-i18n="feature_secure_label">დაცული შეკვეთა</span></span>
                     <span class="feature-leader"></span>
-                    <span class="feature-value">✓</span>
+                    <span class="feature-value" data-i18n="feature_secure_value">✓</span>
                 </div>
             </div>
         </div>
 
         <aside class="hero-ticket" aria-hidden="true">
-            <div class="ticket-heading">დღევანდელი ინფო</div>
-            <div class="ticket-row"><span>მუშაობის საათები</span><span>10:00–18:00</span></div>
-            <div class="ticket-row"><span>მიწოდების ზონა</span><span>ქალაქი / სოფელი</span></div>
-            <div class="ticket-row"><span>მიწოდების ღირებულება</span><span>5–20 ₾</span></div>
-            <div class="ticket-row"><span>450 ₾-ზე მეტ შეკვეთაზე</span><span>უფასო</span></div>
+            <div class="ticket-heading" data-i18n="ticket_heading">დღევანდელი ინფო</div>
+            <div class="ticket-row"><span data-i18n="ticket_hours_label">მუშაობის საათები</span><span data-i18n="ticket_hours_value">10:00–18:00</span></div>
+            <div class="ticket-row"><span data-i18n="ticket_zone_label">მიწოდების ზონა</span><span data-i18n="ticket_zone_value">ქალაქი / სოფელი</span></div>
+            <div class="ticket-row"><span data-i18n="ticket_fee_label">მიწოდების ღირებულება</span><span data-i18n="ticket_fee_value">3–20 ₾</span></div>
+            <div class="ticket-row"><span data-i18n="ticket_free_label">250 ₾-ზე მეტ შეკვეთაზე</span><span data-i18n="ticket_free_value">უფასო</span></div>
             <div class="ticket-barcode"></div>
         </aside>
     </div>
@@ -91,7 +96,7 @@
 
 <main class="container">
     <div id="product-list" class="product-grid">
-        <p style="grid-column:1/-1; text-align:center; padding: 40px; color:#888;">იტვირთება...</p>
+        <p style="grid-column:1/-1; text-align:center; padding: 40px; color:#888;" data-i18n="loading_products">იტვირთება...</p>
     </div>
 </main>
 
@@ -99,16 +104,16 @@
     <div class="container">
         <div class="footer-content">
             <div class="footer-col">
-                <h4 class="footer-heading">კონტაქტი</h4>
+                <h4 class="footer-heading" data-i18n="footer_contact_heading">კონტაქტი</h4>
                 <ul class="footer-contact-list">
                     <li><i class="fa-solid fa-location-dot"></i> ახალციხე, იაძის ქუჩა #2ი</li>
                     <li><i class="fa-solid fa-phone"></i> +995 500 22 48 22</li>
-                    <li><i class="fa-regular fa-clock"></i> ყოველდღე 10:00 - 18:00</li>
+                    <li><i class="fa-regular fa-clock"></i> <span data-i18n="footer_hours">ყოველდღე 10:00 - 18:00</span></li>
                 </ul>
             </div>
 
             <div class="footer-col">
-                <h4 class="footer-heading">საბანკო რეკვიზიტები</h4>
+                <h4 class="footer-heading" data-i18n="footer_bank_heading">საბანკო რეკვიზიტები</h4>
                 <div class="iban-card">
                     <span class="iban-title">ლიბერთი ბანკი (LIBERTY BANK)</span>
                     <div class="iban-code-box">
@@ -120,7 +125,7 @@
         </div>
         <div class="footer-bottom">
             <div class="container">
-                <p>© 2026 MINI MARKET. ყველა უფლება დაცულია. · <a href="old.html">ძველი ვერსია</a></p>
+                <p>© 2026 MINI MARKET. <span data-i18n="footer_copy_text">ყველა უფლება დაცულია.</span> · <a href="old.html">ძველი ვერსია</a></p>
             </div>
         </div>
     </div>
@@ -131,7 +136,7 @@
     <div class="modal-card">
         <div class="modal-header">
             <div class="modal-title">
-                <i class="fa-solid fa-robot"></i> AI ასისტენტი - შეკვეთის გაფორმება
+                <i class="fa-solid fa-robot"></i> <span data-i18n="modal_title">AI ასისტენტი - შეკვეთის გაფორმება</span>
             </div>
             <button id="close-modal-btn" class="close-btn" type="button"><i class="fa-solid fa-xmark"></i></button>
         </div>
@@ -139,20 +144,20 @@
         <div class="modal-body-split">
             <!-- Cart Summary -->
             <div class="cart-summary-column">
-                <h3 class="column-title"><i class="fa-solid fa-cart-flatbed"></i> თქვენი კალათა</h3>
+                <h3 class="column-title"><i class="fa-solid fa-cart-flatbed"></i> <span data-i18n="cart_column_title">თქვენი კალათა</span></h3>
                 <div id="cart-items-container" class="cart-items-list"></div>
 
                 <div class="cart-billing-box">
                     <div class="bill-line">
-                        <span>პროდუქცია:</span>
+                        <span data-i18n="bill_products">პროდუქცია:</span>
                         <span class="bill-val"><span id="subtotal-price">0.00</span> ₾</span>
                     </div>
                     <div class="bill-line">
-                        <span>მიწოდების საფასური:</span>
+                        <span data-i18n="bill_delivery">მიწოდების საფასური:</span>
                         <span class="bill-val"><span id="delivery-price">3.00</span> ₾</span>
                     </div>
                     <div class="bill-line total">
-                        <span>სულ გადასახდელი:</span>
+                        <span data-i18n="bill_total">სულ გადასახდელი:</span>
                         <span class="bill-val highlight"><span id="final-price">0.00</span> ₾</span>
                     </div>
                 </div>
@@ -163,18 +168,19 @@
                 <div id="ai-messages-box" class="chat-messages-container"></div>
 
                 <div id="ai-input-wrapper" class="chat-input-area">
-                    <input type="text" id="ai-user-input" placeholder="ჩაწერთ პასუხი აქ..." autocomplete="off">
+                    <input type="text" id="ai-user-input" placeholder="ჩაწერთ პასუხი აქ..." data-i18n-placeholder="chat_input_placeholder" autocomplete="off">
                     <button id="ai-send-btn" class="send-btn" type="button"><i class="fa-solid fa-paper-plane"></i></button>
                 </div>
 
                 <button id="submit-order-btn" class="confirm-order-btn hidden" type="button">
-                    <i class="fa-solid fa-check"></i> შეკვეთის დადასტურება
+                    <i class="fa-solid fa-check"></i> <span data-i18n="submit_btn">შეკვეთის დადასტურება</span>
                 </button>
             </div>
         </div>
     </div>
 </div>
 
+<script src="i18n.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
