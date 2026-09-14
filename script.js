@@ -1,13 +1,13 @@
 let allProducts = [];
 let cart = [];
 
-let deliveryCost = 3.00;
+let deliveryCost = 5.00;
 
 // Web3Forms delivers this order straight to the shop's inbox in the background.
 const WEB3FORMS_ACCESS_KEY = "5c6ec571-bc5b-4d67-b235-26c5655fb970";
 
 // Delivery price within the city (edit this number to match your real cost, 3-5 GEL range).
-const CITY_DELIVERY_PRICE = 4;
+const CITY_DELIVERY_PRICE = 5;
 
 // Delivery price per village/community (temi) in Akhaltsikhe municipality.
 // These are PLACEHOLDER numbers based only on the community list - EDIT them to your real
@@ -15,19 +15,24 @@ const CITY_DELIVERY_PRICE = 4;
 // Georgian in every language since they are official place names.
 const VILLAGE_DELIVERY_PRICES = {
     "აგარა": 8,
+    "ვალე":8,
     "კლდე": 9,
     "ანდრიაწმინდა": 10,
     "აწყური": 10,
     "მინაძე": 11,
     "საძელი": 12,
     "ელიაწმინდა": 12,
-    "პამაჯი": 13,
+    "პატარა პამაჯი": 13,
+    "დიდი პამაჯი":12,
     "სვირი": 14,
     "სხვილისი": 15,
     "ურავლი": 16,
     "ფერსა": 18,
     "წყალთბილა": 19,
-    "წყრუთი": 20
+    "წყრუთი": 20,
+    "ნაოხრები"20,
+    "წინუბანი სომხ." 12,
+    "წინა ანი ქართ."20
 };
 
 let collectedData = {
