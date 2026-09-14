@@ -1,13 +1,13 @@
 let allProducts = [];
 let cart = [];
 
-let deliveryCost = 5.00;
+let deliveryCost = 3.00;
 
 // Web3Forms delivers this order straight to the shop's inbox in the background.
 const WEB3FORMS_ACCESS_KEY = "5c6ec571-bc5b-4d67-b235-26c5655fb970";
 
 // Delivery price within the city (edit this number to match your real cost, 3-5 GEL range).
-const CITY_DELIVERY_PRICE = 5;
+const CITY_DELIVERY_PRICE = 4;
 
 // Delivery price per village/community (temi) in Akhaltsikhe municipality.
 // These are PLACEHOLDER numbers based only on the community list - EDIT them to your real
@@ -15,24 +15,19 @@ const CITY_DELIVERY_PRICE = 5;
 // Georgian in every language since they are official place names.
 const VILLAGE_DELIVERY_PRICES = {
     "აგარა": 8,
-    "ვალე":8,
     "კლდე": 9,
     "ანდრიაწმინდა": 10,
     "აწყური": 10,
     "მინაძე": 11,
     "საძელი": 12,
     "ელიაწმინდა": 12,
-    "პატარა პამაჯი": 13,
-    "დიდი პამაჯი":12,
+    "პამაჯი": 13,
     "სვირი": 14,
     "სხვილისი": 15,
     "ურავლი": 16,
     "ფერსა": 18,
     "წყალთბილა": 19,
-    "წყრუთი": 20,
-    "ნაოხრები"20,
-    "წინუბანი სომხ." 12,
-    "წინა ანი ქართ."20
+    "წყრუთი": 20
 };
 
 let collectedData = {
@@ -91,6 +86,17 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+
+    // 5. Playful logo bounce on tap/click
+    const logoIcon = document.querySelector('.brand-logo .logo-icon');
+    const brandLogo = document.querySelector('.brand-logo');
+    if (brandLogo && logoIcon) {
+        brandLogo.addEventListener('click', () => {
+            logoIcon.classList.remove('logo-bump');
+            void logoIcon.offsetWidth;
+            logoIcon.classList.add('logo-bump');
+        });
+    }
 });
 
 function renderProducts(products) {
@@ -118,7 +124,7 @@ function renderProducts(products) {
             </div>
             <div class="product-footer">
                 <div class="product-price">${Number(item.price).toFixed(2)} ₾</div>
-                <button type="button" class="add-to-cart-btn" onclick="addToCartWithQty(${i}, '${safeName}', ${item.price})">
+                <button type="button" class="add-to-cart-btn" onclick="addToCartWithQty(this, ${i}, '${safeName}', ${item.price})">
                     <i class="fa-solid fa-cart-plus"></i> ${t('add_to_cart_btn')}
                 </button>
             </div>
@@ -136,11 +142,18 @@ function adjustQty(i, delta) {
     span.innerText = val;
 }
 
-function addToCartWithQty(i, name, price) {
+function addToCartWithQty(btnEl, i, name, price) {
     const span = document.getElementById('qty-' + i);
     const qtyToAdd = span ? parseInt(span.innerText, 10) : 1;
     addToCart(name, price, qtyToAdd);
     if (span) span.innerText = 1;
+
+    if (btnEl) {
+        btnEl.classList.remove('added-flash');
+        void btnEl.offsetWidth; // restart animation if clicked again quickly
+        btnEl.classList.add('added-flash');
+        setTimeout(() => btnEl.classList.remove('added-flash'), 500);
+    }
 }
 
 function addToCart(name, price, qty = 1) {
@@ -157,8 +170,13 @@ function updateCartUI() {
     const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
 
-    document.getElementById('cart-count').innerText = totalQty;
+    const badge = document.getElementById('cart-count');
+    badge.innerText = totalQty;
     document.getElementById('cart-total-header').innerText = subtotal.toFixed(2);
+
+    badge.classList.remove('badge-pop');
+    void badge.offsetWidth;
+    badge.classList.add('badge-pop');
 }
 
 function updateCartTotals() {
