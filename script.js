@@ -7,32 +7,27 @@ let deliveryCost = 3.00;
 const WEB3FORMS_ACCESS_KEY = "5c6ec571-bc5b-4d67-b235-26c5655fb970";
 
 // Delivery price within the city (edit this number to match your real cost, 3-5 GEL range).
-const CITY_DELIVERY_PRICE = 5;
+const CITY_DELIVERY_PRICE = 4;
 
 // Delivery price per village/community (temi) in Akhaltsikhe municipality.
 // These are PLACEHOLDER numbers based only on the community list - EDIT them to your real
-// per-village delivery cost (8-20 GEL range) before publishing.
+// per-village delivery cost (8-20 GEL range) before publishing. Village names are kept in
+// Georgian in every language since they are official place names.
 const VILLAGE_DELIVERY_PRICES = {
-    "აგარა": 9,
-    "კლდე": 10,
+    "აგარა": 8,
+    "კლდე": 9,
     "ანდრიაწმინდა": 10,
     "აწყური": 10,
     "მინაძე": 11,
     "საძელი": 12,
     "ელიაწმინდა": 12,
-    "პატარა პამაჯი": 13,
-    "დიდი პამაჯი":12,
+    "პამაჯი": 13,
     "სვირი": 14,
     "სხვილისი": 15,
     "ურავლი": 16,
     "ფერსა": 18,
     "წყალთბილა": 19,
-    "წყრუთი": 20,
-    "ჭაჭარაქი":11,
-    "ნაოხრები":20,
-    "ხაკი":20,
-    "ყულალისი":15,
-    "საძელი":12
+    "წყრუთი": 20
 };
 
 let collectedData = {
@@ -53,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .catch(err => {
             console.error("Error loading products:", err);
-            document.getElementById('product-list').innerHTML = '<p style="color:red; grid-column:1/-1; text-align:center;">პროდუქტების ჩატვირთვა ვერ მოხერხდა.</p>';
+            document.getElementById('product-list').innerHTML = `<p style="color:red; grid-column:1/-1; text-align:center;">${t('products_load_error')}</p>`;
         });
 
     // 2. Search
@@ -98,7 +93,7 @@ function renderProducts(products) {
     container.innerHTML = '';
 
     if (!products || products.length === 0) {
-        container.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding: 40px; color:#888;">პროდუქტი ვერ მოიძებნა.</p>';
+        container.innerHTML = `<p style="grid-column:1/-1; text-align:center; padding: 40px; color:#888;">${t('products_not_found')}</p>`;
         return;
     }
 
@@ -119,7 +114,7 @@ function renderProducts(products) {
             <div class="product-footer">
                 <div class="product-price">${Number(item.price).toFixed(2)} ₾</div>
                 <button type="button" class="add-to-cart-btn" onclick="addToCartWithQty(${i}, '${safeName}', ${item.price})">
-                    <i class="fa-solid fa-cart-plus"></i> დამატება
+                    <i class="fa-solid fa-cart-plus"></i> ${t('add_to_cart_btn')}
                 </button>
             </div>
         `;
@@ -181,7 +176,7 @@ function renderCartItems() {
     container.innerHTML = '';
 
     if (cart.length === 0) {
-        container.innerHTML = '<p style="text-align:center; padding:30px; color:#888;">კალათა ცარიელია</p>';
+        container.innerHTML = `<p style="text-align:center; padding:30px; color:#888;">${t('cart_empty')}</p>`;
         return;
     }
 
@@ -222,7 +217,7 @@ function isWorkingHours() {
 // ================= AI Modal Flow =================
 function openCheckoutModal() {
     if (cart.length === 0) {
-        alert("გთხოვთ, ჯერ დაამატოთ პროდუქტი კალათაში!");
+        alert(t('cart_empty_alert'));
         return;
     }
 
@@ -238,7 +233,7 @@ function openCheckoutModal() {
     const submitBtn = document.getElementById('submit-order-btn');
     submitBtn.classList.add('hidden');
     submitBtn.disabled = false;
-    submitBtn.innerHTML = '<i class="fa-solid fa-check"></i> შეკვეთის დადასტურება';
+    submitBtn.innerHTML = `<i class="fa-solid fa-check"></i> ${t('submit_btn')}`;
 
     // reset collected data / flow state for a fresh order
     collectedData = {
@@ -250,7 +245,7 @@ function openCheckoutModal() {
 
     if (!isWorkingHours()) {
         document.getElementById('ai-input-wrapper').classList.add('hidden');
-        appendAIMessage("⛔ გამარჯობა! ამჟამად არასამუშაო საათებია (10:00 - 18:00).\n\nონლაინ შეკვეთების მიღება დროებით შეჩერებულია. გთხოვთ გვეწვიოთ მარკეტში: **ახალციხე, იაძის ქუჩა #2ი**!", 'bot');
+        appendAIMessage(t('closed_msg'), 'bot');
         return;
     }
 
@@ -266,38 +261,30 @@ function closeCheckoutModal() {
 // kind: 'text' (typed answer with optional validate/format),
 //       'choice' (tap one of a few buttons),
 //       'select' (dropdown - used for the village list)
+// promptKey / errorKey reference the translations dictionary so the flow follows
+// whichever language the customer picked with the GE/EN/RU/AM switcher.
 const steps = [
     {
         id: "fullName", kind: "text",
-        prompt: "გამარჯობა! მე ვარ Mini Market-ის AI კონსულტანტი. 🛒\n\nსიამოვნებით დაგეხმარებით შეკვეთის გაფორმებაში. გთხოვთ მიუთითოთ თქვენი **სახელი და გვარი**:",
-        validate: (input) => {
-            if (input.trim().length < 2) {
-                return "⚠️ **შეცდომა:** გთხოვთ მიუთითოთ სახელი და გვარი.";
-            }
-            return null;
-        }
+        promptKey: "greet"
     },
     {
         id: "personalId", kind: "text",
-        prompt: "გმადლობთ! ახლა გთხოვთ მიუთითოთ თქვენი **პირადი ნომერი** (ზუსტად 11 ციფრი):",
+        promptKey: "ask_personal_id",
         validate: (input) => {
             const clean = input.replace(/\D/g, '');
-            if (clean.length !== 11) {
-                return "⚠️ **შეცდომა:** პირადი ნომერი უნდა შედგებოდეს ზუსტად 11 ციფრისგან! გთხოვთ ჩაწერთ ხელახლა.";
-            }
+            if (clean.length !== 11) return t('err_personal_id');
             return null;
         },
         format: (input) => input.replace(/\D/g, '')
     },
     {
         id: "mobile", kind: "text",
-        prompt: "შესანიშნავია. რა არის თქვენი **მობილურის ნომერი**? (მაგ: 599123456 - 9 ციფრი):",
+        promptKey: "ask_mobile",
         validate: (input) => {
             const clean = input.replace(/\D/g, '');
             const num = clean.startsWith('995') ? clean.slice(3) : clean;
-            if (num.length !== 9) {
-                return "⚠️ **შეცდომა:** ტელეფონის ნომერი არასწორია ან მოკლეა! გთხოვთ მიუთითოთ ზუსტად 9 ციფრიანი ნომერი (მაგ: 599123456).";
-            }
+            if (num.length !== 9) return t('err_mobile');
             return null;
         },
         format: (input) => {
@@ -307,11 +294,11 @@ const steps = [
     },
     {
         id: "zoneChoice", kind: "choice",
-        prompt: "გთხოვთ აირჩიოთ მიწოდების ზონა:",
-        options: ["ქალაქი", "სოფელი"],
-        onAnswer: (value) => {
-            collectedData.zoneChoice = value;
-            if (value === "ქალაქი") {
+        promptKey: "ask_zone",
+        optionCodes: ["city", "village"],
+        onAnswer: (code) => {
+            collectedData.zoneChoice = code;
+            if (code === "city") {
                 deliveryCost = CITY_DELIVERY_PRICE;
                 updateCartTotals();
             }
@@ -320,8 +307,8 @@ const steps = [
     },
     {
         id: "village", kind: "select",
-        prompt: "აირჩიეთ თქვენი სოფელი/თემი - მიწოდების ფასი ავტომატურად დაითვლება:",
-        showIf: () => collectedData.zoneChoice === "სოფელი",
+        promptKey: "ask_village",
+        showIf: () => collectedData.zoneChoice === "village",
         optionsMap: VILLAGE_DELIVERY_PRICES,
         onAnswer: (value) => {
             collectedData.village = value;
@@ -331,30 +318,21 @@ const steps = [
     },
     {
         id: "cityAddress", kind: "text",
-        prompt: "გთხოვთ ჩამიწეროთ **ზუსტი მისამართი** (ქუჩა, შენობის/სახლის ნომერი):",
-        showIf: () => collectedData.zoneChoice === "ქალაქი",
+        promptKey: "ask_city_address",
+        showIf: () => collectedData.zoneChoice === "city",
         validate: (input) => {
-            if (input.trim().length < 4) {
-                return "⚠️ **შეცდომა:** მისამართი ძალიან მოკლეა! გთხოვთ მიუთითოთ სრული მისამართი შეკვეთის ზუსტად მოსატანად.";
-            }
+            if (input.trim().length < 4) return t('err_address_short');
             return null;
         }
     },
-    {
-        id: "floorCode", kind: "text",
-        prompt: "ხომ ვერ დააზუსტებთ **სართულს, ბინის ნომერს, სადარბაზოს კოდს ან სახლის ნიშანს**?"
-    },
-    {
-        id: "freshnessReq", kind: "text",
-        remindBefore: true,
-        prompt: "შეკვეთაში გვაქვს მალფუჭებადი პროდუქტები. ხორცპროდუქტებსა და რძის ნაწარმზე ხომ არ გაქვთ ვარგისიანობის ვადის განსაკუთრებული მოთხოვნა?"
-    },
-    { id: "breadType", kind: "text", prompt: "პურ-ფუნთუშეულისა და საკონდიტრო ნაწარმის შემთხვევაში, რა სახეობის/ფაქტურის პროდუქტი გირჩევნიათ?" },
-    { id: "allergyNotes", kind: "text", prompt: "ხომ არ აქვს ვინმეს **ალერგია** რომელიმე ინგრედიენტზე (მაგ. ლაქტოზა, გლუტენი, თხილეული)?" },
-    { id: "replacementPolicy", kind: "text", prompt: "თუ რომელიმე კონკრეტული ბრენდი საწყობში არ აღმოჩნდება, გსურთ თუ არა სხვა ექვივალენტური ბრენდით ჩანაცვლება?" },
-    { id: "deliveryTime", kind: "text", prompt: "როდის გსურთ კურიერის მოსვლა? (გთხოვთ მიუთითოთ **სასურველი დროის ინტერვალი**):" },
-    { id: "paymentMethod", kind: "text", prompt: "გადახდას როგორ გეგმავთ: **ნაღდი ანგარიშსწორებით** კურიერთან თუ **საბანკო გადარიცხვით**?" },
-    { id: "changeRequirement", kind: "text", prompt: "თუ ნაღდი ანგარიშსწორებაა, დასჭირდება თუ არა კურიერს **ხურდის მოტანა** (რა თანხიდან)?" }
+    { id: "floorCode", kind: "text", promptKey: "ask_floor_code" },
+    { id: "freshnessReq", kind: "text", promptKey: "ask_freshness", remindBefore: true },
+    { id: "breadType", kind: "text", promptKey: "ask_bread" },
+    { id: "allergyNotes", kind: "text", promptKey: "ask_allergy" },
+    { id: "replacementPolicy", kind: "text", promptKey: "ask_replacement" },
+    { id: "deliveryTime", kind: "text", promptKey: "ask_delivery_time" },
+    { id: "paymentMethod", kind: "text", promptKey: "ask_payment" },
+    { id: "changeRequirement", kind: "text", promptKey: "ask_change" }
 ];
 
 function findNextStepIndex(fromIndex) {
@@ -375,10 +353,10 @@ function renderStep(idx) {
     const step = steps[idx];
 
     if (step.remindBefore) {
-        appendAIMessage("💡 *შეხსენება:* თუ გეჩქარებათ, შეგიძლიათ პირდაპირ მობრძანდეთ ჩვენს მინი მარკეტში **იაძის ქუჩა #2ი-ში**!\n\nთუმცა, თუ ონლაინ გირჩევნიათ, გავაგრძელოთ 👇", 'bot');
+        appendAIMessage(t('remind_visit'), 'bot');
     }
 
-    appendAIMessage(step.prompt, 'bot');
+    appendAIMessage(t(step.promptKey), 'bot');
 
     if (step.kind === "text") {
         document.getElementById('ai-input-wrapper').classList.remove('hidden');
@@ -398,7 +376,7 @@ function advanceFlow() {
 }
 
 function finishFlow() {
-    appendAIMessage("🎉 **ყველა მონაცემი ზუსტად შემოწმდა და მიღებულია!**\n\nქვემოთ გამოჩნდა ღილაკი — დააჭირეთ და შეკვეთა დასრულდება!", 'bot');
+    appendAIMessage(t('finish_msg'), 'bot');
     document.getElementById('ai-input-wrapper').classList.add('hidden');
     document.getElementById('submit-order-btn').classList.remove('hidden');
 }
@@ -407,15 +385,15 @@ function renderChoiceButtons(step) {
     const box = document.getElementById('ai-messages-box');
     const wrap = document.createElement('div');
     wrap.className = 'chat-choice-row';
-    step.options.forEach(opt => {
+    step.optionCodes.forEach(code => {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'chat-choice-btn';
-        btn.innerText = opt;
+        btn.innerText = t('zone_' + code);
         btn.addEventListener('click', () => {
             wrap.remove();
-            appendAIMessage(opt, 'user');
-            if (step.onAnswer) step.onAnswer(opt);
+            appendAIMessage(t('zone_' + code), 'user');
+            if (step.onAnswer) step.onAnswer(code);
             advanceFlow();
         });
         wrap.appendChild(btn);
@@ -499,21 +477,23 @@ function appendAIMessage(text, sender) {
 function copyIBAN() {
     const iban = document.getElementById('iban-code').innerText;
     navigator.clipboard.writeText(iban).then(() => {
-        alert("ანგარიშის ნომერი კოპირებულია!");
+        alert(t('iban_copied_alert'));
     });
 }
 
+// The order message emailed to the shop always stays in Georgian - that's for the
+// shop owner reading it, regardless of which language the customer used on the site.
 function buildOrderMessage() {
     const itemsText = cart.map(i => `• ${i.name} - ${i.qty}ც (${(i.price * i.qty).toFixed(2)}₾)`).join('\n');
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
     let finalDelivery = subtotal >= 250 ? 0 : deliveryCost;
     const finalTotal = subtotal + finalDelivery;
 
-    const zoneDisplay = collectedData.zoneChoice === "სოფელი"
+    const zoneDisplay = collectedData.zoneChoice === "village"
         ? `სოფელი/თემი: ${collectedData.village}`
         : "ქალაქი";
 
-    const addressDisplay = collectedData.zoneChoice === "სოფელი"
+    const addressDisplay = collectedData.zoneChoice === "village"
         ? `${collectedData.village} (იხ. ზონა)`
         : collectedData.cityAddress;
 
@@ -574,17 +554,17 @@ async function submitOrderToEmail(message) {
 async function sendFinalOrder() {
     const btn = document.getElementById('submit-order-btn');
     btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> იგზავნება...';
+    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ${t('submit_btn_sending')}`;
 
     const message = buildOrderMessage();
     const success = await submitOrderToEmail(message);
 
     if (success) {
-        appendAIMessage("✅ თქვენი შეკვეთა წარმატებით მიღებულია! ჩვენი წარმომადგენელი მალე დაგიკავშირდებათ დეტალების დასაზუსტებლად.\n\nმადლობა რომ გვირჩევთ! 🙏", 'bot');
+        appendAIMessage(t('success_msg'), 'bot');
         btn.classList.add('hidden');
     } else {
         btn.disabled = false;
-        btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> სცადეთ თავიდან';
-        appendAIMessage("⚠️ შეკვეთის გაგზავნისას მოხდა შეცდომა. გთხოვთ სცადოთ ხელახლა ან დაგვირეკოთ ტელეფონით.", 'bot error');
+        btn.innerHTML = `<i class="fa-solid fa-rotate-right"></i> ${t('submit_btn_retry')}`;
+        appendAIMessage(t('error_send_msg'), 'bot error');
     }
 }
