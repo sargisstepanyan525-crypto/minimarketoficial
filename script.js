@@ -15,28 +15,19 @@ const CITY_DELIVERY_PRICE = 4;
 // Georgian in every language since they are official place names.
 const VILLAGE_DELIVERY_PRICES = {
     "აგარა": 8,
-    "ვალე":10,
     "კლდე": 9,
     "ანდრიაწმინდა": 10,
     "აწყური": 10,
     "მინაძე": 11,
     "საძელი": 12,
     "ელიაწმინდა": 12,
-    "პატარა პამაჯი": 13,
-    "დიდი პამაჯი":10,
+    "პამაჯი": 13,
     "სვირი": 14,
     "სხვილისი": 15,
     "ურავლი": 16,
     "ფერსა": 18,
     "წყალთბილა": 19,
-    "წყრუთი": 20,
-    "წინუბანი სომხ":18,
-    "წინუბანი ქართ":20,
-    "სხვილისი":8,
-    "წნისი":8,
-    "საძელი":8,
-    "ორალი":9,
-
+    "წყრუთი": 20
 };
 
 let collectedData = {
@@ -106,6 +97,9 @@ document.addEventListener("DOMContentLoaded", () => {
             logoIcon.classList.add('logo-bump');
         });
     }
+
+    // 6. Site-wide Smart AI Assistant (FAQ chat, available on every page load)
+    initSmartAssistant();
 });
 
 function renderProducts(products) {
@@ -599,4 +593,130 @@ async function sendFinalOrder() {
         btn.innerHTML = `<i class="fa-solid fa-rotate-right"></i> ${t('submit_btn_retry')}`;
         appendAIMessage(t('error_send_msg'), 'bot error');
     }
+}
+
+// ================= Site-wide Smart AI Assistant (FAQ + product search) =================
+// This runs entirely client-side (keyword/intent matching + a live search over
+// products.json) - it does not call any external AI API, so it works instantly
+// with no extra setup or API keys. It can be swapped later for a real LLM-backed
+// assistant if a backend proxy is added to keep an API key private.
+
+let faqGreeted = false;
+
+function initSmartAssistant() {
+    const fab = document.getElementById('faq-fab');
+    const panel = document.getElementById('faq-panel');
+    const closeBtn = document.getElementById('faq-close-btn');
+    const input = document.getElementById('faq-input');
+    const sendBtn = document.getElementById('faq-send-btn');
+
+    if (!fab || !panel) return;
+
+    fab.addEventListener('click', () => {
+        const isOpen = panel.classList.toggle('open');
+        fab.classList.toggle('open', isOpen);
+        const icon = fab.querySelector('i');
+        if (icon) {
+            icon.className = isOpen ? 'fa-solid fa-xmark' : 'fa-solid fa-sparkles';
+        }
+        if (isOpen) {
+            if (!faqGreeted) {
+                faqGreeted = true;
+                faqAppend(t('faq_greeting'), 'bot');
+            }
+            setTimeout(() => input && input.focus(), 200);
+        }
+    });
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            panel.classList.remove('open');
+            fab.classList.remove('open');
+        });
+    }
+
+    function send() {
+        const text = input.value.trim();
+        if (!text) return;
+        faqAppend(text, 'user');
+        input.value = '';
+        faqTypingThenReply(text);
+    }
+
+    if (sendBtn) sendBtn.addEventListener('click', send);
+    if (input) {
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') send();
+        });
+        input.addEventListener('focus', () => {
+            setTimeout(() => input.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+        });
+    }
+}
+
+function faqAppend(text, sender) {
+    const box = document.getElementById('faq-messages');
+    if (!box) return;
+    const div = document.createElement('div');
+    div.className = `chat-bubble ${sender}`;
+    div.innerText = text;
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+}
+
+function faqTypingThenReply(userText) {
+    const box = document.getElementById('faq-messages');
+    if (!box) return;
+    const typing = document.createElement('div');
+    typing.className = 'chat-bubble bot typing-bubble';
+    typing.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
+    box.appendChild(typing);
+    box.scrollTop = box.scrollHeight;
+
+    setTimeout(() => {
+        typing.remove();
+        faqAppend(getSmartReply(userText), 'bot');
+    }, 550 + Math.random() * 450);
+}
+
+// Keyword lists cover all 4 site languages at once, so the assistant recognizes
+// the question regardless of which language the visitor is typing in.
+const FAQ_INTENTS = [
+    { keys: ['საათ', 'ღიაა', 'მუშაობ', 'hour', 'work', 'open', 'час', 'работа', 'ժամ', 'աշխատ', 'բաց'], replyKey: 'faq_ans_hours' },
+    { keys: ['250', 'უფასო', 'free', 'бесплат', 'անվճար'], replyKey: 'faq_ans_free_delivery' },
+    { keys: ['სოფ', 'ვილიჯ', 'village', 'дерев', 'сел', 'գյուղ', 'համայնք'], replyKey: 'faq_ans_villages' },
+    { keys: ['მიწოდებ', 'მიტან', 'куриер', 'достав', 'delivery', 'shipping', 'առաք'], replyKey: 'faq_ans_delivery' },
+    { keys: ['გადახდ', 'ნაღდ', 'оплат', 'payment', 'pay', 'cash', 'վճար'], replyKey: 'faq_ans_payment' },
+    { keys: ['ტელეფონ', 'დარეკ', 'მისამართ', 'contact', 'phone', 'address', 'телефон', 'адрес', 'контакт', 'հեռախոս', 'հասցե'], replyKey: 'faq_ans_contact' },
+    { keys: ['ვინ ხარ', 'შენ რა ხარ', 'who are you', 'what are you', 'кто ты', 'что ты', 'ով ես', 'ինչ ես'], replyKey: 'faq_ans_who' },
+    { keys: ['როგორ', 'შეკვეთ', 'order', 'how to', 'заказ', 'как', 'ինչպես', 'պատվեր'], replyKey: 'faq_ans_how_to_order' }
+];
+
+function getSmartReply(userText) {
+    const q = userText.toLowerCase();
+
+    for (const intent of FAQ_INTENTS) {
+        if (intent.keys.some(k => q.includes(k))) {
+            return t(intent.replyKey);
+        }
+    }
+
+    // Fallback: live product search over the catalog already loaded on the page.
+    if (allProducts && allProducts.length) {
+        const words = q.split(/[\s,.!?;:()]+/).filter(w => w.length >= 3);
+        if (words.length) {
+            const matches = allProducts
+                .filter(p => {
+                    const pname = p.name.toLowerCase();
+                    return words.some(w => pname.includes(w));
+                })
+                .slice(0, 5);
+            if (matches.length) {
+                const list = matches.map(m => `\u2022 ${m.name} \u2014 ${Number(m.price).toFixed(2)} \u20be`).join('\n');
+                return `${t('faq_found_products')}\n${list}`;
+            }
+        }
+    }
+
+    return t('faq_fallback');
 }
