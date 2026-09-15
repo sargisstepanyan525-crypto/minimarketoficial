@@ -1,3 +1,4 @@
+მიმდინარეობს განახლება ვებ-გვერდის
 <!DOCTYPE html>
 <html lang="ka">
 <head>
@@ -87,8 +88,8 @@
             <div class="ticket-heading" data-i18n="ticket_heading">დღევანდელი ინფო</div>
             <div class="ticket-row"><span data-i18n="ticket_hours_label">მუშაობის საათები</span><span data-i18n="ticket_hours_value">10:00–18:00</span></div>
             <div class="ticket-row"><span data-i18n="ticket_zone_label">მიწოდების ზონა</span><span data-i18n="ticket_zone_value">ქალაქი / სოფელი</span></div>
-            <div class="ticket-row"><span data-i18n="ticket_fee_label">მიწოდების ღირებულება</span><span data-i18n="ticket_fee_value">5–20 ₾</span></div>
-            <div class="ticket-row"><span data-i18n="ticket_free_label">450 ₾-ზე მეტ შეკვეთაზე</span><span data-i18n="ticket_free_value">უფასო</span></div>
+            <div class="ticket-row"><span data-i18n="ticket_fee_label">მიწოდების ღირებულება</span><span data-i18n="ticket_fee_value">3–20 ₾</span></div>
+            <div class="ticket-row"><span data-i18n="ticket_free_label">250 ₾-ზე მეტ შეკვეთაზე</span><span data-i18n="ticket_free_value">უფასო</span></div>
             <div class="ticket-barcode"></div>
         </aside>
     </div>
@@ -177,6 +178,30 @@
                 </button>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Site-wide Smart AI Assistant (answers general questions, always available) -->
+<button id="faq-fab" class="faq-fab" type="button" aria-label="AI Assistant">
+    <i class="fa-solid fa-sparkles"></i>
+    <span class="faq-fab-pulse"></span>
+</button>
+
+<div id="faq-panel" class="faq-panel">
+    <div class="faq-panel-header">
+        <div class="faq-panel-title-wrap">
+            <div class="faq-panel-icon"><i class="fa-solid fa-robot"></i></div>
+            <div>
+                <div class="faq-panel-title" data-i18n="faq_panel_title">AI კონსულტანტი</div>
+                <div class="faq-panel-subtitle" data-i18n="faq_panel_subtitle">მკითხეთ ნებისმიერი კითხვა</div>
+            </div>
+        </div>
+        <button id="faq-close-btn" class="close-btn" type="button"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div id="faq-messages" class="faq-messages"></div>
+    <div class="faq-input-row">
+        <input type="text" id="faq-input" data-i18n-placeholder="faq_input_placeholder" placeholder="დასვით შეკითხვა..." autocomplete="off">
+        <button id="faq-send-btn" class="send-btn" type="button"><i class="fa-solid fa-paper-plane"></i></button>
     </div>
 </div>
 
