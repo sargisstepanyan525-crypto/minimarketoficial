@@ -184,6 +184,50 @@ body {
     backdrop-filter: blur(14px) saturate(160%);
     -webkit-backdrop-filter: blur(14px) saturate(160%);
     border-bottom: 1px solid var(--surface-border);
+    transition: box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.main-header.scrolled {
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 8px 24px -12px rgba(16, 19, 26, 0.18);
+}
+
+/* Scrolling feature-highlight ticker between header and hero */
+.marquee-strip {
+    background: linear-gradient(90deg, var(--violet), var(--violet-dark) 55%, var(--teal-dark));
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 9px 0;
+}
+
+.marquee-track {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    animation: marqueeScroll 22s linear infinite;
+    will-change: transform;
+}
+
+.marquee-strip:hover .marquee-track {
+    animation-play-state: paused;
+}
+
+.marquee-item {
+    color: #ffffff;
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+}
+
+.marquee-dot {
+    color: rgba(255, 255, 255, 0.5);
+    padding: 0 4px;
+}
+
+@keyframes marqueeScroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
 }
 
 .header-wrapper {
@@ -336,6 +380,7 @@ body {
     background: var(--violet);
     top: -160px;
     left: -100px;
+    animation: blobDriftA 14s ease-in-out infinite;
 }
 
 .hero-section::after {
@@ -344,6 +389,17 @@ body {
     background: var(--teal);
     bottom: -180px;
     right: -80px;
+    animation: blobDriftB 16s ease-in-out infinite;
+}
+
+@keyframes blobDriftA {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(60px, 40px) scale(1.15); }
+}
+
+@keyframes blobDriftB {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(-50px, -30px) scale(1.1); }
 }
 
 .hero-grid {
@@ -452,6 +508,12 @@ body {
     z-index: 1;
     backdrop-filter: blur(16px) saturate(160%);
     -webkit-backdrop-filter: blur(16px) saturate(160%);
+    animation: heroTicketFloat 5s ease-in-out infinite;
+}
+
+@keyframes heroTicketFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
 }
 
 .hero-ticket::before,
@@ -524,7 +586,21 @@ body {
     flex-direction: column;
     justify-content: space-between;
     transition: var(--transition);
+    animation: cardRise 0.45s ease both;
 }
+
+@keyframes cardRise {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.product-card:nth-child(1) { animation-delay: 0.02s; }
+.product-card:nth-child(2) { animation-delay: 0.06s; }
+.product-card:nth-child(3) { animation-delay: 0.10s; }
+.product-card:nth-child(4) { animation-delay: 0.14s; }
+.product-card:nth-child(5) { animation-delay: 0.18s; }
+.product-card:nth-child(6) { animation-delay: 0.22s; }
+.product-card:nth-child(n+7) { animation-delay: 0.24s; }
 
 .product-card:hover {
     transform: translateY(-5px);
@@ -541,6 +617,7 @@ body {
     margin-bottom: 14px;
     background: var(--bg);
     border-radius: var(--radius-sm);
+    position: relative;
 }
 
 .product-img-wrapper img {
@@ -1005,6 +1082,35 @@ body {
     .feature-label { font-size: 12px; }
 }
 
+/* Skeleton shimmer shown while products.json is loading */
+.skeleton-card {
+    background: var(--surface);
+    border: 1px solid var(--surface-border);
+    border-radius: var(--radius-md);
+    padding: 18px;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.skeleton-block {
+    border-radius: var(--radius-sm);
+    background: linear-gradient(100deg, var(--bg) 30%, #e9eaf2 50%, var(--bg) 70%);
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.4s ease-in-out infinite;
+}
+
+.skeleton-block.img { height: 150px; }
+.skeleton-block.line { height: 14px; width: 80%; }
+.skeleton-block.line.short { width: 50%; }
+.skeleton-block.pill { height: 32px; width: 100%; border-radius: 20px; margin-top: auto; }
+
+@keyframes skeletonShimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
 /* ===== Micro-interactions / small delightful touches ===== */
 
 .brand-logo { cursor: pointer; }
@@ -1255,4 +1361,36 @@ body {
         bottom: 84px;
         height: 62vh;
     }
+}
+
+/* ===== Ripple feedback on buttons ===== */
+.add-to-cart-btn,
+.cart-btn,
+.confirm-order-btn,
+.chat-choice-btn,
+.qty-btn,
+.lang-btn,
+.send-btn,
+.chat-select-confirm {
+    position: relative;
+    overflow: hidden;
+}
+
+/* faq-fab must stay position:fixed and overflow:visible (for its pulse halo),
+   so the ripple span is positioned against it without touching those properties. */
+.faq-fab {
+    position: fixed;
+}
+
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.55);
+    transform: scale(0);
+    animation: rippleAnim 0.65s ease-out;
+    pointer-events: none;
+}
+
+@keyframes rippleAnim {
+    to { transform: scale(2.6); opacity: 0; }
 }
