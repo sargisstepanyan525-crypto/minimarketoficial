@@ -100,7 +100,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 6. Site-wide Smart AI Assistant (FAQ chat, available on every page load)
     initSmartAssistant();
+
+    // 7. Header gains a touch more depth once the page scrolls
+    const mainHeader = document.querySelector('.main-header');
+    if (mainHeader) {
+        window.addEventListener('scroll', () => {
+            mainHeader.classList.toggle('scrolled', window.scrollY > 12);
+        }, { passive: true });
+    }
+
+    // 8. Material-style ripple feedback on every primary button
+    attachRippleEffect('.add-to-cart-btn, .cart-btn, .confirm-order-btn, .chat-choice-btn, .qty-btn, .lang-btn, .faq-fab, .send-btn, .chat-select-confirm');
 });
+
+function attachRippleEffect(selector) {
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest(selector);
+        if (!btn) return;
+        const rect = btn.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const ripple = document.createElement('span');
+        ripple.className = 'ripple';
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+        ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+        btn.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 650);
+    });
+}
 
 function renderProducts(products) {
     const container = document.getElementById('product-list');
@@ -681,10 +708,14 @@ function faqTypingThenReply(userText) {
 
 // Keyword lists cover all 4 site languages at once, so the assistant recognizes
 // the question regardless of which language the visitor is typing in.
+// Order matters: more specific intents are checked before broader ones.
 const FAQ_INTENTS = [
-    { keys: ['საათ', 'ღიაა', 'მუშაობ', 'hour', 'work', 'open', 'час', 'работа', 'ժամ', 'աշխատ', 'բաց'], replyKey: 'faq_ans_hours' },
+    { keys: ['გამარჯობ', 'სალამ', 'hello', 'hi ', 'hey', 'привет', 'здравств', 'բարև', 'ողջույն'], replyKey: 'faq_ans_greeting' },
+    { keys: ['მადლობ', 'გმადლობთ', 'thank', 'спасибо', 'благодар', 'շնորհակալ'], replyKey: 'faq_ans_thanks' },
+    { keys: ['რა გაქვთ', 'რა პროდუქტ', 'ასორტიმენტ', 'კატალოგ', 'what do you have', 'what do you sell', 'catalog', 'что у вас', 'ассортимент', 'ինչ ունեք', 'կատալոգ'], replyKey: 'faq_ans_catalog' },
     { keys: ['250', 'უფასო', 'free', 'бесплат', 'անվճար'], replyKey: 'faq_ans_free_delivery' },
     { keys: ['სოფ', 'ვილიჯ', 'village', 'дерев', 'сел', 'գյուղ', 'համայնք'], replyKey: 'faq_ans_villages' },
+    { keys: ['საათ', 'ღიაა', 'მუშაობ', 'hour', 'work', 'open', 'час', 'работа', 'ժամ', 'աշխատ', 'բաց'], replyKey: 'faq_ans_hours' },
     { keys: ['მიწოდებ', 'მიტან', 'куриер', 'достав', 'delivery', 'shipping', 'առաք'], replyKey: 'faq_ans_delivery' },
     { keys: ['გადახდ', 'ნაღდ', 'оплат', 'payment', 'pay', 'cash', 'վճար'], replyKey: 'faq_ans_payment' },
     { keys: ['ტელეფონ', 'დარეკ', 'მისამართ', 'contact', 'phone', 'address', 'телефон', 'адрес', 'контакт', 'հեռախոս', 'հասցե'], replyKey: 'faq_ans_contact' },
