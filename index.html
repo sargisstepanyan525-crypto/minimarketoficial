@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>MINI MARKET | ონლაინ მაღაზია ახალციხეში</title>
+<meta name="description" content="Mini Market - ონლაინ მაღაზია ახალციხეში AI კონსულტანტით. სწრაფი მიწოდება ქალაქსა და სოფლებში.">
+<meta property="og:title" content="MINI MARKET | ონლაინ მაღაზია ახალციხეში">
+<meta property="og:description" content="შეუკვეთეთ AI კონსულტანტთან ერთად - სწრაფი მიწოდება ქალაქსა და სოფლებში.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%2316140f'/%3E%3Ctext x='50' y='68' font-size='58' text-anchor='middle' fill='%23b08d57'%3E%F0%9F%A7%BA%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800&family=Noto+Serif+Georgian:wght@500;600;700&display=swap" rel="stylesheet">
@@ -46,6 +51,13 @@
             <i class="fa-solid fa-magnifying-glass search-icon"></i>
             <input type="text" id="search-input" placeholder="მოძებნეთ პროდუქტი..." data-i18n-placeholder="search_placeholder">
         </div>
+
+        <select id="sort-select" class="sort-select" aria-label="Sort products">
+            <option value="default" data-i18n="sort_default">სორტირება</option>
+            <option value="name" data-i18n="sort_name">სახელით (ა-ჰ)</option>
+            <option value="price_low" data-i18n="sort_price_low">ფასი: დაბლიდან მაღლა</option>
+            <option value="price_high" data-i18n="sort_price_high">ფასი: მაღლიდან დაბლა</option>
+        </select>
 
         <button id="open-cart-btn" class="cart-btn" type="button">
             <div class="cart-icon-wrapper">
@@ -106,6 +118,15 @@
 </section>
 
 <main class="container">
+    <div class="category-filter">
+        <button type="button" class="category-chip active" data-category="all"><i class="fa-solid fa-grip"></i> <span data-i18n="cat_all">ყველა</span></button>
+        <button type="button" class="category-chip" data-category="drinks"><i class="fa-solid fa-bottle-water"></i> <span data-i18n="cat_drinks">სასმელები</span></button>
+        <button type="button" class="category-chip" data-category="meat_dairy"><i class="fa-solid fa-drumstick-bite"></i> <span data-i18n="cat_meat_dairy">ხორცი და რძის ნაწარმი</span></button>
+        <button type="button" class="category-chip" data-category="sweets"><i class="fa-solid fa-cookie"></i> <span data-i18n="cat_sweets">ტკბილეული და სნექები</span></button>
+        <button type="button" class="category-chip" data-category="spices"><i class="fa-solid fa-mortar-pestle"></i> <span data-i18n="cat_spices">სუნელები</span></button>
+        <button type="button" class="category-chip" data-category="household"><i class="fa-solid fa-broom"></i> <span data-i18n="cat_household">საყოფაცხოვრებო</span></button>
+        <button type="button" class="category-chip" data-category="pantry"><i class="fa-solid fa-jar"></i> <span data-i18n="cat_pantry">სურსათი</span></button>
+    </div>
     <div id="product-list" class="product-grid">
         <div class="skeleton-card"><div class="skeleton-block img"></div><div class="skeleton-block line"></div><div class="skeleton-block line short"></div><div class="skeleton-block pill"></div></div>
         <div class="skeleton-card"><div class="skeleton-block img"></div><div class="skeleton-block line"></div><div class="skeleton-block line short"></div><div class="skeleton-block pill"></div></div>
@@ -154,6 +175,7 @@
             </div>
             <button id="close-modal-btn" class="close-btn" type="button"><i class="fa-solid fa-xmark"></i></button>
         </div>
+        <div class="checkout-progress"><div id="checkout-progress-bar" class="checkout-progress-bar"></div></div>
 
         <div class="modal-body-split">
             <!-- Cart Summary -->
@@ -218,6 +240,12 @@
         <button id="faq-send-btn" class="send-btn" type="button"><i class="fa-solid fa-paper-plane"></i></button>
     </div>
 </div>
+
+<div id="toast-container" class="toast-container"></div>
+
+<button id="back-to-top-btn" class="back-to-top-btn" type="button" aria-label="Back to top">
+    <i class="fa-solid fa-arrow-up"></i>
+</button>
 
 <script src="i18n.js"></script>
 <script src="script.js"></script>
