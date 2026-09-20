@@ -1,13 +1,13 @@
 let allProducts = [];
 let cart = [];
 
-let deliveryCost = 3.00;
+let deliveryCost = 4.00;
 
 // Web3Forms delivers this order straight to the shop's inbox in the background.
 const WEB3FORMS_ACCESS_KEY = "5c6ec571-bc5b-4d67-b235-26c5655fb970";
 
 // Delivery price within the city (edit this number to match your real cost, 3-5 GEL range).
-const CITY_DELIVERY_PRICE = 4;
+const CITY_DELIVERY_PRICE = 5;
 
 // Delivery price per village/community (temi) in Akhaltsikhe municipality.
 // These are PLACEHOLDER numbers based only on the community list - EDIT them to your real
@@ -41,8 +41,57 @@ let collectedData = {
 };
 
 let stepIndex = -1;
+let activeCategory = 'all';
+
+// Lightweight keyword-based categorizer - the catalog has no category field, so a
+// product's name decides its bucket. Order matters: first matching bucket wins.
+const CATEGORY_RULES = [
+    { code: 'drinks', keys: ['წყალი', 'კოკ-კოლა', 'ფანტა', 'არაყი', 'ლუდი', 'წვენი', 'ენერგეტიკული', 'ყავა'] },
+    { code: 'meat_dairy', keys: ['ხორც', 'ქათმის', 'ღორის', 'სუჯუხი', 'ბასტურმა', 'ხიზილალა', 'რძის', 'ერბო', 'სპრედი'] },
+    { code: 'sweets', keys: ['შოკოლად', 'ვაფლი', 'ჩირის', 'მზესუმზირა', 'ჩიფსი'] },
+    { code: 'spices', keys: ['სუნელი', 'ვანილი', 'ნიორი', 'კურკუმა', 'როზმარინი', 'რეჰანი', 'ბარბარისი'] },
+    { code: 'household', keys: ['ტუალეტ', 'სარეცხის', 'საპონი', 'ასანთი', 'ხელთათმან', 'ხელსახოც', 'სალფეთქ', 'ტილო', 'ნაჭერი', 'საწმენდ'] }
+];
+
+function categorize(name) {
+    const n = name.toLowerCase();
+    for (const rule of CATEGORY_RULES) {
+        if (rule.keys.some(k => n.includes(k))) return rule.code;
+    }
+    return 'pantry';
+}
+
+function applyProductFilters() {
+    const searchInput = document.getElementById('search-input');
+    const sortSelect = document.getElementById('sort-select');
+    const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+    const sortMode = sortSelect ? sortSelect.value : 'default';
+
+    let list = allProducts;
+    if (activeCategory !== 'all') {
+        list = list.filter(p => categorize(p.name) === activeCategory);
+    }
+    if (query) {
+        list = list.filter(p => p.name.toLowerCase().includes(query));
+    }
+
+    list = list.slice();
+    if (sortMode === 'name') {
+        list.sort((a, b) => a.name.localeCompare(b.name, 'ka'));
+    } else if (sortMode === 'price_low') {
+        list.sort((a, b) => a.price - b.price);
+    } else if (sortMode === 'price_high') {
+        list.sort((a, b) => b.price - a.price);
+    }
+
+    renderProducts(list);
+}
 
 document.addEventListener("DOMContentLoaded", () => {
+    // 0. Restore any cart saved from a previous visit
+    loadCartFromStorage();
+    updateCartUI();
+
     // 1. Fetch JSON products
     fetch('products.json?t=' + new Date().getTime())
         .then(res => res.json())
@@ -58,11 +107,23 @@ document.addEventListener("DOMContentLoaded", () => {
     // 2. Search
     const searchInput = document.getElementById('search-input');
     if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase().trim();
-            renderProducts(allProducts.filter(p => p.name.toLowerCase().includes(query)));
-        });
+        searchInput.addEventListener('input', applyProductFilters);
     }
+
+    const sortSelect = document.getElementById('sort-select');
+    if (sortSelect) {
+        sortSelect.addEventListener('change', applyProductFilters);
+    }
+
+    // 2b. Category chips
+    document.querySelectorAll('.category-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            activeCategory = chip.getAttribute('data-category');
+            applyProductFilters();
+        });
+    });
 
     // 3. Listeners
     document.getElementById('open-cart-btn').addEventListener('click', openCheckoutModal);
@@ -107,10 +168,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 7. Header gains a touch more depth once the page scrolls
     const mainHeader = document.querySelector('.main-header');
-    if (mainHeader) {
+    const backToTopBtn = document.getElementById('back-to-top-btn');
+    if (mainHeader || backToTopBtn) {
         window.addEventListener('scroll', () => {
-            mainHeader.classList.toggle('scrolled', window.scrollY > 12);
+            if (mainHeader) mainHeader.classList.toggle('scrolled', window.scrollY > 12);
+            if (backToTopBtn) backToTopBtn.classList.toggle('visible', window.scrollY > 500);
         }, { passive: true });
+    }
+    if (backToTopBtn) {
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
     }
 
     // 8. Material-style ripple feedback on every primary button
@@ -188,6 +256,8 @@ function addToCartWithQty(btnEl, i, name, price) {
         btnEl.classList.add('added-flash');
         setTimeout(() => btnEl.classList.remove('added-flash'), 500);
     }
+
+    showToast(`${name} \u2014 ${t('toast_added')}`, 'success');
 }
 
 function addToCart(name, price, qty = 1) {
@@ -211,6 +281,25 @@ function updateCartUI() {
     badge.classList.remove('badge-pop');
     void badge.offsetWidth;
     badge.classList.add('badge-pop');
+
+    saveCartToStorage();
+}
+
+// Cart persistence - so a page refresh or a returning visitor doesn't lose their basket.
+function saveCartToStorage() {
+    try {
+        localStorage.setItem('mm_cart', JSON.stringify(cart));
+    } catch (e) { /* storage unavailable - fail silently, cart still works for this session */ }
+}
+
+function loadCartFromStorage() {
+    try {
+        const saved = localStorage.getItem('mm_cart');
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed)) cart = parsed;
+        }
+    } catch (e) { /* ignore corrupt/blocked storage */ }
 }
 
 function updateCartTotals() {
@@ -291,7 +380,7 @@ function isWorkingHours() {
 // ================= AI Modal Flow =================
 function openCheckoutModal() {
     if (cart.length === 0) {
-        alert(t('cart_empty_alert'));
+        showToast(t('cart_empty_alert'), 'warn');
         return;
     }
 
@@ -308,6 +397,9 @@ function openCheckoutModal() {
     submitBtn.classList.add('hidden');
     submitBtn.disabled = false;
     submitBtn.innerHTML = `<i class="fa-solid fa-check"></i> ${t('submit_btn')}`;
+
+    const progressBar = document.getElementById('checkout-progress-bar');
+    if (progressBar) progressBar.style.width = '0%';
 
     // reset collected data / flow state for a fresh order
     collectedData = {
@@ -427,12 +519,27 @@ function findNextStepIndex(fromIndex) {
     return steps.length;
 }
 
+function updateCheckoutProgress(idx) {
+    const bar = document.getElementById('checkout-progress-bar');
+    if (!bar) return;
+    const visible = [];
+    steps.forEach((s, i) => { if (!s.showIf || s.showIf()) visible.push(i); });
+    const position = visible.indexOf(idx);
+    const total = visible.length;
+    const pct = total > 0 ? Math.min(100, Math.round(((position + 1) / total) * 100)) : 0;
+    bar.style.width = pct + '%';
+}
+
 function renderStep(idx) {
     if (idx >= steps.length) {
+        updateCheckoutProgress(steps.length - 1);
+        const bar = document.getElementById('checkout-progress-bar');
+        if (bar) bar.style.width = '100%';
         finishFlow();
         return;
     }
     const step = steps[idx];
+    updateCheckoutProgress(idx);
 
     if (step.remindBefore) {
         appendAIMessage(t('remind_visit'), 'bot');
@@ -574,8 +681,24 @@ function appendAIMessage(text, sender) {
 function copyIBAN() {
     const iban = document.getElementById('iban-code').innerText;
     navigator.clipboard.writeText(iban).then(() => {
-        alert(t('iban_copied_alert'));
+        showToast(t('iban_copied_alert'), 'success');
     });
+}
+
+// Elegant toast notification - replaces native alert() popups.
+function showToast(message, type) {
+    const container = document.getElementById('toast-container');
+    if (!container) { console.log(message); return; }
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type || 'info'}`;
+    const icon = type === 'success' ? 'fa-circle-check' : (type === 'warn' ? 'fa-triangle-exclamation' : 'fa-circle-info');
+    toast.innerHTML = `<i class="fa-solid ${icon}"></i><span>${message}</span>`;
+    container.appendChild(toast);
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 3200);
 }
 
 // The order message emailed to the shop always stays in Georgian - that's for the
