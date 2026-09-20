@@ -30,6 +30,10 @@ const VILLAGE_DELIVERY_PRICES = {
     "წყრუთი": 20
 };
 
+// Time windows offered when an order is placed outside working hours - delivery
+// for those orders happens the next day in one of these slots.
+const NEXT_DAY_SLOTS = ["10:00-12:00", "12:00-14:00", "14:00-16:00", "16:00-18:00"];
+
 let collectedData = {
     fullName: "", personalId: "", mobile: "", zoneChoice: "", village: "", cityAddress: "",
     floorCode: "", freshnessReq: "", breadType: "", allergyNotes: "", replacementPolicy: "",
@@ -222,6 +226,23 @@ function updateCartTotals() {
     document.getElementById('subtotal-price').innerText = subtotal.toFixed(2);
     document.getElementById('delivery-price').innerText = currentDelivery.toFixed(2);
     document.getElementById('final-price').innerText = finalTotal.toFixed(2);
+
+    const hint = document.getElementById('free-delivery-hint');
+    if (hint) {
+        if (subtotal <= 0) {
+            hint.classList.add('hidden');
+            hint.classList.remove('reached');
+            hint.textContent = '';
+        } else if (subtotal >= 250) {
+            hint.classList.remove('hidden');
+            hint.classList.add('reached');
+            hint.textContent = t('free_delivery_reached');
+        } else {
+            hint.classList.remove('hidden');
+            hint.classList.remove('reached');
+            hint.textContent = t('free_delivery_progress').replace('{amount}', (250 - subtotal).toFixed(2));
+        }
+    }
 }
 
 function renderCartItems() {
@@ -297,9 +318,7 @@ function openCheckoutModal() {
     stepIndex = -1;
 
     if (!isWorkingHours()) {
-        document.getElementById('ai-input-wrapper').classList.add('hidden');
-        appendAIMessage(t('closed_msg'), 'bot');
-        return;
+        appendAIMessage(t('outside_hours_notice'), 'bot');
     }
 
     stepIndex = findNextStepIndex(-1);
@@ -362,7 +381,10 @@ const steps = [
         id: "village", kind: "select",
         promptKey: "ask_village",
         showIf: () => collectedData.zoneChoice === "village",
-        optionsMap: VILLAGE_DELIVERY_PRICES,
+        options: Object.keys(VILLAGE_DELIVERY_PRICES).map(name => ({
+            value: name,
+            label: `${name} \u2014 ${VILLAGE_DELIVERY_PRICES[name]} \u20be`
+        })),
         onAnswer: (value) => {
             collectedData.village = value;
             deliveryCost = VILLAGE_DELIVERY_PRICES[value] || 10;
@@ -383,7 +405,14 @@ const steps = [
     { id: "breadType", kind: "text", promptKey: "ask_bread" },
     { id: "allergyNotes", kind: "text", promptKey: "ask_allergy" },
     { id: "replacementPolicy", kind: "text", promptKey: "ask_replacement" },
-    { id: "deliveryTime", kind: "text", promptKey: "ask_delivery_time" },
+    { id: "deliveryTime", kind: "text", promptKey: "ask_delivery_time", showIf: () => isWorkingHours() },
+    {
+        id: "deliveryTimeSlot", kind: "select",
+        promptKey: "ask_delivery_time_next_day",
+        showIf: () => !isWorkingHours(),
+        options: NEXT_DAY_SLOTS.map(slot => ({ value: slot, label: slot })),
+        onAnswer: (value) => { collectedData.deliveryTime = value; }
+    },
     { id: "paymentMethod", kind: "text", promptKey: "ask_payment" },
     { id: "changeRequirement", kind: "text", promptKey: "ask_change" }
 ];
@@ -419,7 +448,7 @@ function renderStep(idx) {
         renderChoiceButtons(step);
     } else if (step.kind === "select") {
         document.getElementById('ai-input-wrapper').classList.add('hidden');
-        renderVillageSelect(step);
+        renderSelectStep(step);
     }
 }
 
@@ -429,9 +458,23 @@ function advanceFlow() {
 }
 
 function finishFlow() {
-    appendAIMessage(t('finish_msg'), 'bot');
+    appendAIMessage(buildRecapMessage(), 'bot');
     document.getElementById('ai-input-wrapper').classList.add('hidden');
     document.getElementById('submit-order-btn').classList.remove('hidden');
+}
+
+function buildRecapMessage() {
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+    const finalDelivery = subtotal >= 250 ? 0 : deliveryCost;
+    const total = subtotal + finalDelivery;
+    const itemCount = cart.reduce((sum, item) => sum + item.qty, 0);
+    const zoneText = collectedData.zoneChoice === "village" ? collectedData.village : t('zone_city');
+
+    return t('recap_intro')
+        .replace('{name}', collectedData.fullName || '')
+        .replace('{count}', itemCount)
+        .replace('{zone}', zoneText)
+        .replace('{total}', total.toFixed(2));
 }
 
 function renderChoiceButtons(step) {
@@ -455,18 +498,18 @@ function renderChoiceButtons(step) {
     box.scrollTop = box.scrollHeight;
 }
 
-function renderVillageSelect(step) {
+function renderSelectStep(step) {
     const box = document.getElementById('ai-messages-box');
     const wrap = document.createElement('div');
     wrap.className = 'chat-select-row';
 
     const select = document.createElement('select');
     select.className = 'chat-select';
-    Object.keys(step.optionsMap).forEach(name => {
-        const opt = document.createElement('option');
-        opt.value = name;
-        opt.innerText = `${name} \u2014 ${step.optionsMap[name]} \u20be`;
-        select.appendChild(opt);
+    step.options.forEach(opt => {
+        const optionEl = document.createElement('option');
+        optionEl.value = opt.value;
+        optionEl.innerText = opt.label;
+        select.appendChild(optionEl);
     });
 
     const confirmBtn = document.createElement('button');
@@ -475,8 +518,9 @@ function renderVillageSelect(step) {
     confirmBtn.innerHTML = '<i class="fa-solid fa-check"></i>';
     confirmBtn.addEventListener('click', () => {
         const value = select.value;
+        const chosen = step.options.find(o => o.value === value);
         wrap.remove();
-        appendAIMessage(`${value} (${step.optionsMap[value]} ₾)`, 'user');
+        appendAIMessage(chosen ? chosen.label : value, 'user');
         if (step.onAnswer) step.onAnswer(value);
         advanceFlow();
     });
@@ -650,6 +694,7 @@ function initSmartAssistant() {
             if (!faqGreeted) {
                 faqGreeted = true;
                 faqAppend(t('faq_greeting'), 'bot');
+                faqRenderQuickReplies();
             }
             setTimeout(() => input && input.focus(), 200);
         }
@@ -679,6 +724,42 @@ function initSmartAssistant() {
             setTimeout(() => input.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
         });
     }
+}
+
+const FAQ_QUICK_REPLIES = [
+    { labelKey: 'faq_quick_hours', replyKey: 'faq_ans_hours' },
+    { labelKey: 'faq_quick_delivery', replyKey: 'faq_ans_delivery' },
+    { labelKey: 'faq_quick_payment', replyKey: 'faq_ans_payment' },
+    { labelKey: 'faq_quick_order', replyKey: 'faq_ans_how_to_order' }
+];
+
+function faqRenderQuickReplies() {
+    const box = document.getElementById('faq-messages');
+    if (!box) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'chat-choice-row';
+    FAQ_QUICK_REPLIES.forEach(qr => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'chat-choice-btn';
+        btn.innerText = t(qr.labelKey);
+        btn.addEventListener('click', () => {
+            wrap.remove();
+            faqAppend(t(qr.labelKey), 'user');
+            const typing = document.createElement('div');
+            typing.className = 'chat-bubble bot typing-bubble';
+            typing.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
+            box.appendChild(typing);
+            box.scrollTop = box.scrollHeight;
+            setTimeout(() => {
+                typing.remove();
+                faqAppend(t(qr.replyKey), 'bot');
+            }, 500 + Math.random() * 350);
+        });
+        wrap.appendChild(btn);
+    });
+    box.appendChild(wrap);
+    box.scrollTop = box.scrollHeight;
 }
 
 function faqAppend(text, sender) {
@@ -720,11 +801,17 @@ const FAQ_INTENTS = [
     { keys: ['გადახდ', 'ნაღდ', 'оплат', 'payment', 'pay', 'cash', 'վճար'], replyKey: 'faq_ans_payment' },
     { keys: ['ტელეფონ', 'დარეკ', 'მისამართ', 'contact', 'phone', 'address', 'телефон', 'адрес', 'контакт', 'հեռախոս', 'հասցե'], replyKey: 'faq_ans_contact' },
     { keys: ['ვინ ხარ', 'შენ რა ხარ', 'who are you', 'what are you', 'кто ты', 'что ты', 'ով ես', 'ինչ ես'], replyKey: 'faq_ans_who' },
+    { keys: ['გაუქმებ', 'შეცვლ', 'cancel', 'change order', 'отмен', 'измен', 'չեղարկ', 'փոփոխ'], replyKey: 'faq_ans_cancel' },
     { keys: ['როგორ', 'შეკვეთ', 'order', 'how to', 'заказ', 'как', 'ինչպես', 'պատվեր'], replyKey: 'faq_ans_how_to_order' }
 ];
 
 function getSmartReply(userText) {
     const q = userText.toLowerCase();
+
+    const cartKeys = ['კალათ', 'корзин', 'cart', 'զամբյուղ'];
+    if (cartKeys.some(k => q.includes(k))) {
+        return buildCartStatusReply();
+    }
 
     for (const intent of FAQ_INTENTS) {
         if (intent.keys.some(k => q.includes(k))) {
@@ -750,4 +837,11 @@ function getSmartReply(userText) {
     }
 
     return t('faq_fallback');
+}
+
+function buildCartStatusReply() {
+    if (!cart.length) return t('faq_cart_empty');
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+    const list = cart.map(i => `\u2022 ${i.name} \u2014 ${i.qty} \u00d7 ${i.price.toFixed(2)} \u20be`).join('\n');
+    return `${t('faq_cart_intro')}\n${list}\n\n${t('faq_cart_total')}: ${subtotal.toFixed(2)} \u20be`;
 }
