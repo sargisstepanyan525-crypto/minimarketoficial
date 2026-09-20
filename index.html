@@ -1,4 +1,3 @@
-ვებ-გვერდი მუშაობს სატესტო რეჟიმზე!
 <!DOCTYPE html>
 <html lang="ka">
 <head>
@@ -7,7 +6,7 @@
 <title>MINI MARKET | ონლაინ მაღაზია ახალციხეში</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800&family=Noto+Serif+Georgian:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link rel="stylesheet" href="style.css">
 </head>
@@ -58,24 +57,14 @@
     </div>
 </header>
 
-<div class="marquee-strip">
-    <div class="marquee-track">
-        <span class="marquee-item" data-i18n="marquee_item_1">სწრაფი მიწოდება 1-2 საათში</span>
-        <span class="marquee-dot">&bull;</span>
-        <span class="marquee-item" data-i18n="marquee_item_2">AI კონსულტანტი 24/7</span>
-        <span class="marquee-dot">&bull;</span>
-        <span class="marquee-item" data-i18n="marquee_item_3">დაცული და მარტივი შეკვეთა</span>
-        <span class="marquee-dot">&bull;</span>
-        <span class="marquee-item" data-i18n="marquee_item_4">პირველი ასეთი სერვისი ახალციხეში</span>
-        <span class="marquee-dot">&bull;</span>
-        <span class="marquee-item" data-i18n="marquee_item_1">სწრაფი მიწოდება 1-2 საათში</span>
-        <span class="marquee-dot">&bull;</span>
-        <span class="marquee-item" data-i18n="marquee_item_2">AI კონსულტანტი 24/7</span>
-        <span class="marquee-dot">&bull;</span>
-        <span class="marquee-item" data-i18n="marquee_item_3">დაცული და მარტივი შეკვეთა</span>
-        <span class="marquee-dot">&bull;</span>
-        <span class="marquee-item" data-i18n="marquee_item_4">პირველი ასეთი სერვისი ახალციხეში</span>
-        <span class="marquee-dot">&bull;</span>
+<div class="trust-strip">
+    <div class="container trust-strip-inner">
+        <span class="trust-rotator">
+            <span class="trust-item" data-i18n="marquee_item_1">სწრაფი მიწოდება 1-2 საათში</span>
+            <span class="trust-item" data-i18n="marquee_item_2">AI კონსულტანტი 24/7</span>
+            <span class="trust-item" data-i18n="marquee_item_3">დაცული და მარტივი შეკვეთა</span>
+            <span class="trust-item" data-i18n="marquee_item_4">პირველი ასეთი სერვისი ახალციხეში</span>
+        </span>
     </div>
 </div>
 
@@ -173,6 +162,7 @@
                 <div id="cart-items-container" class="cart-items-list"></div>
 
                 <div class="cart-billing-box">
+                    <div id="free-delivery-hint" class="free-delivery-hint hidden"></div>
                     <div class="bill-line">
                         <span data-i18n="bill_products">პროდუქცია:</span>
                         <span class="bill-val"><span id="subtotal-price">0.00</span> ₾</span>
