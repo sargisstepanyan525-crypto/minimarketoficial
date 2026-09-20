@@ -1,13 +1,13 @@
 let allProducts = [];
 let cart = [];
 
-let deliveryCost = 4.00;
+let deliveryCost = 3.00;
 
 // Web3Forms delivers this order straight to the shop's inbox in the background.
 const WEB3FORMS_ACCESS_KEY = "5c6ec571-bc5b-4d67-b235-26c5655fb970";
 
 // Delivery price within the city (edit this number to match your real cost, 3-5 GEL range).
-const CITY_DELIVERY_PRICE = 5;
+const CITY_DELIVERY_PRICE = 4;
 
 // Delivery price per village/community (temi) in Akhaltsikhe municipality.
 // These are PLACEHOLDER numbers based only on the community list - EDIT them to your real
