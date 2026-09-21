@@ -10,7 +10,7 @@
 */
 
 :root {
-    --ink: #33121a;
+    --ink: #10262b;
     --ink-soft: #6b6459;
     --ivory: #faf8f3;
     --surface: #ffffff;
@@ -77,7 +77,7 @@ body {
 
 ::selection {
     background: var(--brass);
-    color: #2a0d13;
+    color: #12292e;
 }
 
 ::-webkit-scrollbar {
@@ -207,7 +207,7 @@ html {
 
 .lang-btn.active {
     background: var(--brass);
-    color: #2a0d13;
+    color: #12292e;
 }
 
 /* Main Header */
@@ -215,7 +215,7 @@ html {
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(51, 18, 26, 0.92);
+    background: rgba(16, 38, 43, 0.92);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(176, 141, 87, 0.22);
@@ -223,7 +223,7 @@ html {
 }
 
 .main-header.scrolled {
-    background: rgba(51, 18, 26, 0.97);
+    background: rgba(16, 38, 43, 0.97);
     border-bottom-color: rgba(176, 141, 87, 0.4);
     box-shadow: 0 10px 26px -16px rgba(0, 0, 0, 0.5);
 }
@@ -346,7 +346,7 @@ html {
     align-items: center;
     gap: 12px;
     background: var(--brass);
-    color: #2a0d13;
+    color: #12292e;
     border: none;
     padding: 11px 20px;
     border-radius: 30px;
@@ -842,7 +842,7 @@ html {
 }
 
 .add-to-cart-btn:hover {
-    background: #421a24;
+    background: #1a3a41;
 }
 
 /* Free-delivery progress hint inside the checkout cart summary */
@@ -973,7 +973,7 @@ html {
 .modal-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(51, 18, 26, 0.74);
+    background: rgba(16, 38, 43, 0.74);
     backdrop-filter: blur(6px);
     z-index: 1000;
     display: flex;
@@ -1192,14 +1192,14 @@ html {
     overflow: hidden;
 }
 
-.chat-select-confirm:hover { background: #421a24; }
+.chat-select-confirm:hover { background: #1a3a41; }
 
 .send-btn {
     background: var(--ink); color: var(--brass-light); border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer;
     position: relative;
     overflow: hidden;
 }
-.send-btn:hover { background: #421a24; }
+.send-btn:hover { background: #1a3a41; }
 
 .whatsapp-send-btn {
     width: 100%; background: #25d366; color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer;
@@ -1209,7 +1209,7 @@ html {
 .confirm-order-btn {
     width: 100%;
     background: var(--brass);
-    color: #2a0d13;
+    color: #12292e;
     border: none;
     padding: 14px;
     border-radius: 12px;
