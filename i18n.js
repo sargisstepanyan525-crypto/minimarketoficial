@@ -755,8 +755,12 @@ function applyLanguage(lang) {
     });
 
     // refresh dynamic bits that read translations directly (product grid, cart list)
-    if (typeof allProducts !== 'undefined' && allProducts && allProducts.length && typeof renderProducts === 'function') {
-        renderProducts(allProducts);
+    if (typeof allProducts !== 'undefined' && allProducts && allProducts.length) {
+        if (typeof applyProductFilters === 'function') {
+            applyProductFilters();
+        } else if (typeof renderProducts === 'function') {
+            renderProducts(allProducts);
+        }
     }
     if (typeof cart !== 'undefined' && typeof renderCartItems === 'function') {
         renderCartItems();
