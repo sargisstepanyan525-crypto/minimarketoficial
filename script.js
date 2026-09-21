@@ -53,6 +53,16 @@ const CATEGORY_RULES = [
     { code: 'household', keys: ['ტუალეტ', 'სარეცხის', 'საპონი', 'ასანთი', 'ხელთათმან', 'ხელსახოც', 'სალფეთქ', 'ტილო', 'ნაჭერი', 'საწმენდ'] }
 ];
 
+// Returns the product name in the currently selected language when a translation
+// exists (see products-i18n.js); otherwise falls back to the original Georgian
+// name from products.json. Georgian itself always uses the original name.
+function getProductDisplayName(name) {
+    if (currentLang === 'ka') return name;
+    if (typeof PRODUCT_NAME_TRANSLATIONS === 'undefined') return name;
+    const entry = PRODUCT_NAME_TRANSLATIONS[name];
+    return (entry && entry[currentLang]) ? entry[currentLang] : name;
+}
+
 function categorize(name) {
     const n = name.toLowerCase();
     for (const rule of CATEGORY_RULES) {
@@ -214,11 +224,12 @@ function renderProducts(products) {
         const card = document.createElement('div');
         card.className = 'product-card';
         const safeName = item.name.replace(/'/g, "\\'");
+        const displayName = getProductDisplayName(item.name);
         card.innerHTML = `
             <div class="product-img-wrapper">
-                <img src="${item.imageUrl}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/180?text=Mini+Market'">
+                <img src="${item.imageUrl}" alt="${displayName}" onerror="this.src='https://via.placeholder.com/180?text=Mini+Market'">
             </div>
-            <div class="product-title">${item.name}</div>
+            <div class="product-title">${displayName}</div>
             <div class="qty-stepper">
                 <button type="button" class="qty-btn" onclick="adjustQty(${i}, -1)">-</button>
                 <span class="qty-value" id="qty-${i}">1</span>
@@ -348,7 +359,7 @@ function renderCartItems() {
         row.className = 'cart-item-row';
         row.innerHTML = `
             <div>
-                <strong>${item.name}</strong><br>
+                <strong>${getProductDisplayName(item.name)}</strong><br>
                 <small>${item.price.toFixed(2)} ₾ x ${item.qty}</small>
             </div>
             <div>
@@ -953,7 +964,7 @@ function getSmartReply(userText) {
                 })
                 .slice(0, 5);
             if (matches.length) {
-                const list = matches.map(m => `\u2022 ${m.name} \u2014 ${Number(m.price).toFixed(2)} \u20be`).join('\n');
+                const list = matches.map(m => `\u2022 ${getProductDisplayName(m.name)} \u2014 ${Number(m.price).toFixed(2)} \u20be`).join('\n');
                 return `${t('faq_found_products')}\n${list}`;
             }
         }
@@ -965,6 +976,6 @@ function getSmartReply(userText) {
 function buildCartStatusReply() {
     if (!cart.length) return t('faq_cart_empty');
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-    const list = cart.map(i => `\u2022 ${i.name} \u2014 ${i.qty} \u00d7 ${i.price.toFixed(2)} \u20be`).join('\n');
+    const list = cart.map(i => `\u2022 ${getProductDisplayName(i.name)} \u2014 ${i.qty} \u00d7 ${i.price.toFixed(2)} \u20be`).join('\n');
     return `${t('faq_cart_intro')}\n${list}\n\n${t('faq_cart_total')}: ${subtotal.toFixed(2)} \u20be`;
 }
