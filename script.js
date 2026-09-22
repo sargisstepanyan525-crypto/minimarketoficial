@@ -111,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .catch(err => {
             console.error("Error loading products:", err);
-            document.getElementById('product-list').innerHTML = `<p style="color:red; grid-column:1/-1; text-align:center;">${t('products_load_error')}</p>`;
+            document.getElementById('product-list').innerHTML = `<p style="color:var(--danger); grid-column:1/-1; text-align:center;">${t('products_load_error')}</p>`;
         });
 
     // 2. Search
@@ -216,7 +216,7 @@ function renderProducts(products) {
     container.innerHTML = '';
 
     if (!products || products.length === 0) {
-        container.innerHTML = `<p style="grid-column:1/-1; text-align:center; padding: 40px; color:#888;">${t('products_not_found')}</p>`;
+        container.innerHTML = `<p style="grid-column:1/-1; text-align:center; padding: 40px; color:var(--ink-soft);">${t('products_not_found')}</p>`;
         return;
     }
 
@@ -350,7 +350,7 @@ function renderCartItems() {
     container.innerHTML = '';
 
     if (cart.length === 0) {
-        container.innerHTML = `<p style="text-align:center; padding:30px; color:#888;">${t('cart_empty')}</p>`;
+        container.innerHTML = `<p style="text-align:center; padding:30px; color:var(--ink-soft);">${t('cart_empty')}</p>`;
         return;
     }
 
@@ -926,23 +926,23 @@ function faqTypingThenReply(userText) {
 // Order matters: more specific intents are checked before broader ones.
 const FAQ_INTENTS = [
     { keys: ['გამარჯობ', 'სალამ', 'hello', 'hi ', 'hey', 'привет', 'здравств', 'բարև', 'ողջույն'], replyKey: 'faq_ans_greeting' },
-    { keys: ['მადლობ', 'გმადლობთ', 'thank', 'спасибо', 'благодар', 'շնորհակալ'], replyKey: 'faq_ans_thanks' },
+    { keys: ['მადლობ', 'გმადლობთ', 'thank', 'спасибо', 'благодар', 'շნორհაკալ'], replyKey: 'faq_ans_thanks' },
     { keys: ['რა გაქვთ', 'რა პროდუქტ', 'ასორტიმენტ', 'კატალოგ', 'what do you have', 'what do you sell', 'catalog', 'что у вас', 'ассортимент', 'ինչ ունեք', 'կատալոգ'], replyKey: 'faq_ans_catalog' },
     { keys: ['250', 'უფასო', 'free', 'бесплат', 'անվճար'], replyKey: 'faq_ans_free_delivery' },
-    { keys: ['სოფ', 'ვილიჯ', 'village', 'дерев', 'сел', 'գյուղ', 'համայնք'], replyKey: 'faq_ans_villages' },
-    { keys: ['საათ', 'ღიაა', 'მუშაობ', 'hour', 'work', 'open', 'час', 'работа', 'ժամ', 'աշխատ', 'բաց'], replyKey: 'faq_ans_hours' },
-    { keys: ['მიწოდებ', 'მიტან', 'куриер', 'достав', 'delivery', 'shipping', 'առաք'], replyKey: 'faq_ans_delivery' },
-    { keys: ['გადახდ', 'ნაღდ', 'оплат', 'payment', 'pay', 'cash', 'վճար'], replyKey: 'faq_ans_payment' },
+    { keys: ['სოფ', 'ვილიჯ', 'village', 'дерев', 'сел', 'գյუղ', 'համայնք'], replyKey: 'faq_ans_villages' },
+    { keys: ['საათ', 'ღიაა', 'მუშაობ', 'hour', 'work', 'open', 'час', 'работа', 'ჟამ', 'աշխատ', 'բաց'], replyKey: 'faq_ans_hours' },
+    { keys: ['მიწოდებ', 'მიტან', 'куრიერ', 'достав', 'delivery', 'shipping', 'առաք'], replyKey: 'faq_ans_delivery' },
+    { keys: ['გადახდ', 'ნაღდ', 'оплат', 'payment', 'pay', 'cash', 'վճარ'], replyKey: 'faq_ans_payment' },
     { keys: ['ტელეფონ', 'დარეკ', 'მისამართ', 'contact', 'phone', 'address', 'телефон', 'адрес', 'контакт', 'հեռախոս', 'հասցե'], replyKey: 'faq_ans_contact' },
     { keys: ['ვინ ხარ', 'შენ რა ხარ', 'who are you', 'what are you', 'кто ты', 'что ты', 'ով ես', 'ինչ ես'], replyKey: 'faq_ans_who' },
-    { keys: ['გაუქმებ', 'შეცვლ', 'cancel', 'change order', 'отмен', 'измен', 'չեղարկ', 'փոփոխ'], replyKey: 'faq_ans_cancel' },
+    { keys: ['გაუქმებ', 'შეცვლ', 'cancel', 'change order', 'отмен', 'измен', 'չեղարկ', 'փոփოխ'], replyKey: 'faq_ans_cancel' },
     { keys: ['როგორ', 'შეკვეთ', 'order', 'how to', 'заказ', 'как', 'ինչպես', 'պատվեր'], replyKey: 'faq_ans_how_to_order' }
 ];
 
 function getSmartReply(userText) {
     const q = userText.toLowerCase();
 
-    const cartKeys = ['კალათ', 'корзин', 'cart', 'զամբյուղ'];
+    const cartKeys = ['კალათ', 'корзин', 'cart', 'զამբյուղ'];
     if (cartKeys.some(k => q.includes(k))) {
         return buildCartStatusReply();
     }
