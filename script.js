@@ -1,3 +1,9 @@
+(function initThemeEarly() {
+    const saved = localStorage.getItem('mm_theme');
+    const theme = saved || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+})();
+
 let allProducts = [];
 let cart = [];
 
@@ -176,6 +182,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // 6. Site-wide Smart AI Assistant (FAQ chat, available on every page load)
     initSmartAssistant();
 
+    // 6b. Dark mode toggle (persisted; defaults to the visitor's system preference)
+    initThemeToggle();
+
     // 7. Header gains a touch more depth once the page scrolls
     const mainHeader = document.querySelector('.main-header');
     const backToTopBtn = document.getElementById('back-to-top-btn');
@@ -192,7 +201,29 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // 8. Material-style ripple feedback on every primary button
-    attachRippleEffect('.add-to-cart-btn, .cart-btn, .confirm-order-btn, .chat-choice-btn, .qty-btn, .lang-btn, .faq-fab, .send-btn, .chat-select-confirm');
+    attachRippleEffect('.add-to-cart-btn, .cart-btn, .confirm-order-btn, .chat-choice-btn, .qty-btn, .lang-btn, .faq-fab, .send-btn, .chat-select-confirm, .theme-toggle-btn, .back-to-top-btn');
+
+    // 9. Dark mode toggle
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    if (themeBtn) {
+        const icon = themeBtn.querySelector('i');
+        const syncIcon = () => {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            if (icon) icon.className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        };
+        syncIcon();
+        themeBtn.addEventListener('click', () => {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            if (isDark) {
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('mm_theme', 'light');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('mm_theme', 'dark');
+            }
+            syncIcon();
+        });
+    }
 });
 
 function attachRippleEffect(selector) {
@@ -978,4 +1009,48 @@ function buildCartStatusReply() {
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
     const list = cart.map(i => `\u2022 ${getProductDisplayName(i.name)} \u2014 ${i.qty} \u00d7 ${i.price.toFixed(2)} \u20be`).join('\n');
     return `${t('faq_cart_intro')}\n${list}\n\n${t('faq_cart_total')}: ${subtotal.toFixed(2)} \u20be`;
+}
+
+// ================= Dark Mode =================
+// Persists the visitor's choice in localStorage under 'mm_theme'. If they've
+// never chosen, defaults to their OS/browser preference (prefers-color-scheme).
+function initThemeToggle() {
+    const btn = document.getElementById('theme-toggle-btn');
+    const root = document.documentElement;
+
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            root.setAttribute('data-theme', 'dark');
+        } else {
+            root.setAttribute('data-theme', 'light');
+        }
+        if (btn) {
+            const icon = btn.querySelector('i');
+            if (icon) icon.className = theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        }
+    }
+
+    let saved = null;
+    try {
+        saved = localStorage.getItem('mm_theme');
+    } catch (e) {
+        // localStorage unavailable (private browsing etc.) - fall through to system preference
+    }
+
+    const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const initialTheme = saved || (systemPrefersDark ? 'dark' : 'light');
+    applyTheme(initialTheme);
+
+    if (btn) {
+        btn.addEventListener('click', () => {
+            const isDark = root.getAttribute('data-theme') === 'dark';
+            const next = isDark ? 'light' : 'dark';
+            applyTheme(next);
+            try {
+                localStorage.setItem('mm_theme', next);
+            } catch (e) {
+                // ignore - theme just won't persist across visits
+            }
+        });
+    }
 }
