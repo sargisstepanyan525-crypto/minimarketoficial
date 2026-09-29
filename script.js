@@ -48,6 +48,46 @@ let collectedData = {
 
 let stepIndex = -1;
 let activeCategory = 'all';
+let favoriteProducts = loadFavoritesFromStorage();
+
+function loadFavoritesFromStorage() {
+    try {
+        const raw = localStorage.getItem('mm_favorites');
+        if (raw) return new Set(JSON.parse(raw));
+    } catch (e) {
+        // localStorage unavailable - favorites just won't persist
+    }
+    return new Set();
+}
+
+function saveFavoritesToStorage() {
+    try {
+        localStorage.setItem('mm_favorites', JSON.stringify(Array.from(favoriteProducts)));
+    } catch (e) {
+        // ignore
+    }
+}
+
+function toggleFavorite(btnEl, name) {
+    if (favoriteProducts.has(name)) {
+        favoriteProducts.delete(name);
+        btnEl.classList.remove('active');
+    } else {
+        favoriteProducts.add(name);
+        btnEl.classList.add('active');
+    }
+    const icon = btnEl.querySelector('i');
+    if (icon) icon.className = favoriteProducts.has(name) ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+    btnEl.classList.remove('pulse');
+    void btnEl.offsetWidth;
+    btnEl.classList.add('pulse');
+    saveFavoritesToStorage();
+
+    // If the favorites view is currently active, removing one should update the grid live
+    if (activeCategory === 'favorites') {
+        applyProductFilters();
+    }
+}
 
 // Lightweight keyword-based categorizer - the catalog has no category field, so a
 // product's name decides its bucket. Order matters: first matching bucket wins.
@@ -69,6 +109,18 @@ function getProductDisplayName(name) {
     return (entry && entry[currentLang]) ? entry[currentLang] : name;
 }
 
+// Returns a small flag-badge <span> for a product's country of origin (see
+// products-origin.js), or an empty string when no origin is confirmed for it.
+function getOriginBadgeHtml(name) {
+    if (typeof PRODUCT_ORIGIN === 'undefined' || typeof COUNTRY_INFO === 'undefined') return '';
+    const code = PRODUCT_ORIGIN[name];
+    if (!code) return '';
+    const info = COUNTRY_INFO[code];
+    if (!info) return '';
+    const label = info[currentLang] || info.en;
+    return `<span class="origin-badge" title="${label}">${info.flag}</span>`;
+}
+
 function categorize(name) {
     const n = name.toLowerCase();
     for (const rule of CATEGORY_RULES) {
@@ -84,7 +136,9 @@ function applyProductFilters() {
     const sortMode = sortSelect ? sortSelect.value : 'default';
 
     let list = allProducts;
-    if (activeCategory !== 'all') {
+    if (activeCategory === 'favorites') {
+        list = list.filter(p => favoriteProducts.has(p.name));
+    } else if (activeCategory !== 'all') {
         list = list.filter(p => categorize(p.name) === activeCategory);
     }
     if (query) {
@@ -256,8 +310,14 @@ function renderProducts(products) {
         card.className = 'product-card';
         const safeName = item.name.replace(/'/g, "\\'");
         const displayName = getProductDisplayName(item.name);
+        const originBadge = getOriginBadgeHtml(item.name);
+        const isFav = favoriteProducts.has(item.name);
         card.innerHTML = `
+            <button type="button" class="favorite-btn${isFav ? ' active' : ''}" onclick="toggleFavorite(this, '${safeName}')" aria-label="Favorite">
+                <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
+            </button>
             <div class="product-img-wrapper">
+                ${originBadge}
                 <img src="${item.imageUrl}" alt="${displayName}" onerror="this.src='https://via.placeholder.com/180?text=Mini+Market'">
             </div>
             <div class="product-title">${displayName}</div>
