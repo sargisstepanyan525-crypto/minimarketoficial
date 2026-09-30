@@ -317,9 +317,9 @@ function renderProducts(products) {
                 <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
             </button>
             <div class="product-img-wrapper">
-                ${originBadge}
                 <img src="${item.imageUrl}" alt="${displayName}" onerror="this.src='https://via.placeholder.com/180?text=Mini+Market'">
             </div>
+            ${originBadge}
             <div class="product-title">${displayName}</div>
             <div class="qty-stepper">
                 <button type="button" class="qty-btn" onclick="adjustQty(${i}, -1)">-</button>
