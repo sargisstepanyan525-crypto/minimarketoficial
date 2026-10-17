@@ -1080,6 +1080,16 @@ html {
     color: #6b6459;
 }
 
+.footer-credit a {
+    color: var(--brass);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.footer-credit a:hover {
+    text-decoration: underline;
+}
+
 .footer-bottom a:hover {
     color: var(--brass);
 }
@@ -1887,4 +1897,35 @@ html {
 :root[data-theme="dark"] .chat-choice-btn:hover {
     background: var(--brass);
     color: #12191b;
+}
+
+/* ===== Confetti celebration (order success) ===== */
+.confetti-container {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2000;
+    overflow: hidden;
+}
+
+.confetti-piece {
+    position: absolute;
+    top: -12px;
+    width: 9px;
+    height: 14px;
+    opacity: 0.9;
+    animation-name: confettiFall;
+    animation-timing-function: cubic-bezier(.25, .46, .45, .94);
+    animation-fill-mode: forwards;
+}
+
+@keyframes confettiFall {
+    0% {
+        transform: translateY(-10vh) translateX(0) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(110vh) translateX(var(--drift)) rotate(var(--rot));
+        opacity: 0.4;
+    }
 }
