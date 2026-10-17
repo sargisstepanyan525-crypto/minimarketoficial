@@ -455,6 +455,12 @@ body {
     font-size: 13px;
 }
 
+.footer-credit {
+    margin-top: 6px;
+    font-size: 12px;
+    opacity: 0.8;
+}
+
 .footer-bottom a {
     color: #94a3b8;
 }
