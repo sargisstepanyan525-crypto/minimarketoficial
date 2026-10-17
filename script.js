@@ -239,6 +239,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // 6b. Dark mode toggle (persisted; defaults to the visitor's system preference)
     initThemeToggle();
 
+    // 6c. "/" keyboard shortcut jumps to search
+    initSearchShortcut();
+
     // 7. Header gains a touch more depth once the page scrolls
     const mainHeader = document.querySelector('.main-header');
     const backToTopBtn = document.getElementById('back-to-top-btn');
@@ -884,6 +887,7 @@ async function sendFinalOrder() {
     if (success) {
         appendAIMessage(t('success_msg'), 'bot');
         btn.classList.add('hidden');
+        launchConfetti();
     } else {
         btn.disabled = false;
         btn.innerHTML = `<i class="fa-solid fa-rotate-right"></i> ${t('submit_btn_retry')}`;
@@ -1069,6 +1073,44 @@ function buildCartStatusReply() {
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
     const list = cart.map(i => `\u2022 ${getProductDisplayName(i.name)} \u2014 ${i.qty} \u00d7 ${i.price.toFixed(2)} \u20be`).join('\n');
     return `${t('faq_cart_intro')}\n${list}\n\n${t('faq_cart_total')}: ${subtotal.toFixed(2)} \u20be`;
+}
+
+// ================= Confetti celebration =================
+// Pure DOM/CSS, no external library - a short burst of falling pieces used
+// to celebrate a successfully submitted order.
+function launchConfetti() {
+    const colors = ['#b08d57', '#5c6b47', '#10262b', '#e8c590', '#8fae73'];
+    const container = document.createElement('div');
+    container.className = 'confetti-container';
+    const pieceCount = 60;
+    for (let i = 0; i < pieceCount; i++) {
+        const piece = document.createElement('span');
+        piece.className = 'confetti-piece';
+        piece.style.left = Math.random() * 100 + 'vw';
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.animationDuration = (2.2 + Math.random() * 1.6) + 's';
+        piece.style.animationDelay = (Math.random() * 0.4) + 's';
+        piece.style.setProperty('--drift', (Math.random() * 140 - 70) + 'px');
+        piece.style.setProperty('--rot', (Math.random() * 720 - 360) + 'deg');
+        if (Math.random() > 0.5) piece.style.borderRadius = '50%';
+        container.appendChild(piece);
+    }
+    document.body.appendChild(container);
+    setTimeout(() => container.remove(), 4200);
+}
+
+// ================= Keyboard shortcuts =================
+// Press "/" anywhere (outside a text field) to jump straight to the search box.
+function initSearchShortcut() {
+    document.addEventListener('keydown', (e) => {
+        if (e.key !== '/') return;
+        const tag = (document.activeElement && document.activeElement.tagName) || '';
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+        const searchInput = document.getElementById('search-input');
+        if (!searchInput) return;
+        e.preventDefault();
+        searchInput.focus();
+    });
 }
 
 // ================= Dark Mode =================
