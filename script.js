@@ -242,6 +242,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // 6c. "/" keyboard shortcut jumps to search
     initSearchShortcut();
 
+    // 6d. Matrix-style code rain behind the hero
+    initMatrixRain();
+
     // 7. Header gains a touch more depth once the page scrolls
     const mainHeader = document.querySelector('.main-header');
     const backToTopBtn = document.getElementById('back-to-top-btn');
@@ -302,6 +305,9 @@ function attachRippleEffect(selector) {
 function renderProducts(products) {
     const container = document.getElementById('product-list');
     container.innerHTML = '';
+
+    const countEl = document.getElementById('product-count');
+    if (countEl) countEl.textContent = products ? products.length : 0;
 
     if (!products || products.length === 0) {
         container.innerHTML = `<p style="grid-column:1/-1; text-align:center; padding: 40px; color:#888;">${t('products_not_found')}</p>`;
@@ -1079,7 +1085,7 @@ function buildCartStatusReply() {
 // Pure DOM/CSS, no external library - a short burst of falling pieces used
 // to celebrate a successfully submitted order.
 function launchConfetti() {
-    const colors = ['#b08d57', '#5c6b47', '#10262b', '#e8c590', '#8fae73'];
+    const colors = ['#22d3ee', '#34d399', '#6366f1', '#e2e8f0', '#7c3aed'];
     const container = document.createElement('div');
     container.className = 'confetti-container';
     const pieceCount = 60;
@@ -1140,7 +1146,7 @@ function initThemeToggle() {
     }
 
     const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const initialTheme = saved || (systemPrefersDark ? 'dark' : 'light');
+    const initialTheme = saved || 'dark'; // IT-style look is dark-first
     applyTheme(initialTheme);
 
     if (btn) {
@@ -1155,4 +1161,81 @@ function initThemeToggle() {
             }
         });
     }
+}
+
+
+// ================= Matrix code rain (hero background) =================
+// Lightweight canvas effect: falling hex/code glyphs in neon green/cyan.
+// Pauses when the hero is off-screen or the tab is hidden, and renders a
+// static frame only when the visitor prefers reduced motion.
+function initMatrixRain() {
+    const hero = document.querySelector('.hero-section');
+    if (!hero) return;
+    const canvas = document.createElement('canvas');
+    canvas.className = 'hero-matrix';
+    canvas.setAttribute('aria-hidden', 'true');
+    hero.insertBefore(canvas, hero.firstChild);
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const glyphs = '01{}[]<>/;=+*#$%&ABCDEF23456789'.split('');
+    const fontSize = 15;
+    const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let w = 0, h = 0, cols = 0, drops = [];
+    let running = false, heroVisible = true, last = 0;
+
+    function resize() {
+        const rect = hero.getBoundingClientRect();
+        w = canvas.width = Math.max(1, Math.floor(rect.width));
+        h = canvas.height = Math.max(1, Math.floor(rect.height));
+        cols = Math.ceil(w / fontSize);
+        drops = Array.from({ length: cols }, () => Math.floor(Math.random() * -40));
+    }
+
+    function step() {
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.14)';
+        ctx.fillRect(0, 0, w, h);
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.font = fontSize + 'px "JetBrains Mono", monospace';
+        for (let i = 0; i < cols; i++) {
+            const y = drops[i] * fontSize;
+            if (y > 0) {
+                const ch = glyphs[Math.floor(Math.random() * glyphs.length)];
+                ctx.fillStyle = Math.random() > 0.96 ? '#e6fffb' : (i % 5 === 0 ? '#22d3ee' : '#34d399');
+                ctx.fillText(ch, i * fontSize, y);
+            }
+            if (y > h && Math.random() > 0.975) drops[i] = Math.floor(Math.random() * -20);
+            drops[i]++;
+        }
+    }
+
+    function loop(ts) {
+        if (!running) return;
+        if (ts - last > 55) { last = ts; step(); }
+        requestAnimationFrame(loop);
+    }
+
+    function sync() {
+        const shouldRun = heroVisible && !document.hidden && !reduceMotion;
+        if (shouldRun && !running) { running = true; requestAnimationFrame(loop); }
+        else if (!shouldRun) { running = false; }
+    }
+
+    resize();
+    if (reduceMotion) { for (let i = 0; i < 70; i++) step(); }
+
+    if (typeof ResizeObserver !== 'undefined') {
+        new ResizeObserver(() => { resize(); }).observe(hero);
+    } else {
+        window.addEventListener('resize', resize);
+    }
+    if (typeof IntersectionObserver !== 'undefined') {
+        new IntersectionObserver((entries) => {
+            heroVisible = entries[0].isIntersecting;
+            sync();
+        }).observe(hero);
+    }
+    document.addEventListener('visibilitychange', sync);
+    sync();
 }
